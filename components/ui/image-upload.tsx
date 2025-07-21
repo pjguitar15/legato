@@ -5,8 +5,8 @@ import { Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 
 interface ImageUploadProps {
-  value?: string
-  onChange: (url: string | null) => void
+  value?: string | File
+  onChange: (file: File | string | null) => void
   disabled?: boolean
   multiple?: boolean
   maxFiles?: number
@@ -23,191 +23,104 @@ export default function ImageUpload({
   className = '',
   placeholder = 'Click to upload image',
 }: ImageUploadProps) {
-  const cloudinaryRef = useRef<any>(null)
-  const widgetRef = useRef<any>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
-  const [uploadedFiles, setUploadedFiles] = useState<string[]>([])
+  const [previewUrls, setPreviewUrls] = useState<string[]>([])
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
 
   // Handle client-side mounting to prevent hydration mismatch
   useEffect(() => {
     setIsMounted(true)
-    // Set initial files only after mounting
-    if (value) {
-      const initialFiles = Array.isArray(value) ? value : [value]
-      setUploadedFiles(initialFiles.filter(Boolean))
+    // Set initial preview if value is a URL
+    if (value && typeof value === 'string') {
+      setPreviewUrls([value])
     }
   }, [])
 
   // Handle value changes after mounted
   useEffect(() => {
     if (isMounted && value !== undefined) {
-      const newFiles = value ? (Array.isArray(value) ? value : [value]) : []
-      setUploadedFiles(newFiles.filter(Boolean))
+      if (typeof value === 'string' && value) {
+        setPreviewUrls([value])
+        setSelectedFiles([])
+      } else if (value instanceof File) {
+        const url = URL.createObjectURL(value)
+        setPreviewUrls([url])
+        setSelectedFiles([value])
+      } else {
+        setPreviewUrls([])
+        setSelectedFiles([])
+      }
     }
   }, [value, isMounted])
 
-  useEffect(() => {
-    // Only load Cloudinary after component is mounted
-    if (isMounted && typeof window !== 'undefined') {
-      loadCloudinaryWidget()
-    }
-  }, [isMounted])
-
-  const loadCloudinaryWidget = () => {
-    // Check if Cloudinary is already loaded
-    if (window.cloudinary) {
-      initializeWidget()
-      return
-    }
-
-    // Load Cloudinary widget script
-    const existingScript = document.querySelector(
-      'script[src*="cloudinary.com"]',
-    )
-    if (existingScript) {
-      existingScript.addEventListener('load', initializeWidget)
-      return
-    }
-
-    const script = document.createElement('script')
-    script.src = 'https://widget.cloudinary.com/v2.0/global/all.js'
-    script.async = true
-    script.onload = () => {
-      setTimeout(initializeWidget, 100) // Small delay to ensure widget is ready
-    }
-    script.onerror = () => {
-      console.warn('Failed to load Cloudinary widget')
-    }
-    document.head.appendChild(script)
+  const openFileDialog = () => {
+    if (disabled || !isMounted) return
+    fileInputRef.current?.click()
   }
 
-  const initializeWidget = () => {
-    if (!process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME) {
-      console.warn(
-        'Cloudinary cloud name not found. Please add NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME to your environment variables.',
-      )
-      return
-    }
+  const handleFileSelection = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files
+    if (!files || files.length === 0) return
+
+    setIsLoading(true)
 
     try {
-      cloudinaryRef.current = window.cloudinary
-      widgetRef.current = cloudinaryRef.current?.createUploadWidget(
-        {
-          cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-          uploadPreset:
-            process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'legato_preset',
-          sources: ['local', 'url', 'camera'],
-          multiple: multiple,
-          maxFiles: multiple ? maxFiles : 1,
-          maxImageFileSize: 10000000, // 10MB
-          maxImageWidth: 2000,
-          maxImageHeight: 2000,
-          clientAllowedFormats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
-          theme: 'minimal',
-          showAdvancedOptions: false,
-          cropping: false,
-          styles: {
-            palette: {
-              window: '#FFFFFF',
-              windowBorder: '#90A0B3',
-              tabIcon: '#0078FF',
-              menuIcons: '#5A616A',
-              textDark: '#000000',
-              textLight: '#FFFFFF',
-              link: '#0078FF',
-              action: '#FF620C',
-              inactiveTabIcon: '#0E2F5A',
-              error: '#F44235',
-              inProgress: '#0078FF',
-              complete: '#20B832',
-              sourceBg: '#E4EBF1',
-            },
-          },
-        },
-        (error: any, result: any) => {
-          if (!error && result && result.event === 'success') {
-            const imageUrl = result.info.secure_url
+      const fileArray = Array.from(files)
+      const limitedFiles = multiple
+        ? fileArray.slice(0, maxFiles)
+        : [fileArray[0]]
 
-            if (multiple) {
-              const newFiles = [...uploadedFiles, imageUrl]
-              setUploadedFiles(newFiles)
-              onChange(newFiles.join(','))
-            } else {
-              setUploadedFiles([imageUrl])
-              onChange(imageUrl)
-            }
-            setIsLoading(false)
-          }
+      // Create preview URLs for display
+      const urls = limitedFiles.map((file) => URL.createObjectURL(file))
 
-          if (error) {
-            console.error('Cloudinary upload error:', error)
-            setIsLoading(false)
-          }
+      setSelectedFiles(limitedFiles)
+      setPreviewUrls(urls)
 
-          if (result && result.event === 'upload-start') {
-            setIsLoading(true)
-          }
-        },
-      )
-    } catch (error) {
-      console.error('Failed to initialize Cloudinary widget:', error)
-    }
-  }
-
-  const openWidget = () => {
-    if (disabled || !isMounted) return
-
-    if (widgetRef.current) {
-      setIsLoading(true)
-      widgetRef.current.open()
-    } else {
-      // Fallback: simple file input
-      handleSimpleUpload()
-    }
-  }
-
-  const handleSimpleUpload = () => {
-    const input = document.createElement('input')
-    input.type = 'file'
-    input.accept = 'image/*'
-    input.multiple = multiple
-
-    input.onchange = (e) => {
-      const files = (e.target as HTMLInputElement).files
-      if (files && files.length > 0) {
-        setIsLoading(true)
-
-        // For demo purposes when Cloudinary isn't configured
-        const urls = Array.from(files).map((file) => URL.createObjectURL(file))
-
-        setTimeout(() => {
-          if (multiple) {
-            const newFiles = [...uploadedFiles, ...urls]
-            setUploadedFiles(newFiles)
-            onChange(newFiles.join(','))
-          } else {
-            setUploadedFiles([urls[0]])
-            onChange(urls[0])
-          }
-          setIsLoading(false)
-        }, 1000)
+      // Return the file(s) to parent component
+      if (multiple) {
+        onChange(limitedFiles.length > 0 ? limitedFiles[0] : null) // For now, handle single file
+      } else {
+        onChange(limitedFiles[0] || null)
       }
+    } catch (error) {
+      console.error('Error handling file selection:', error)
+    } finally {
+      setIsLoading(false)
     }
-
-    input.click()
   }
 
   const removeImage = (indexToRemove: number) => {
-    const newFiles = uploadedFiles.filter((_, index) => index !== indexToRemove)
-    setUploadedFiles(newFiles)
+    // Clean up object URLs to prevent memory leaks
+    const urlToRevoke = previewUrls[indexToRemove]
+    if (urlToRevoke && urlToRevoke.startsWith('blob:')) {
+      URL.revokeObjectURL(urlToRevoke)
+    }
+
+    const newUrls = previewUrls.filter((_, index) => index !== indexToRemove)
+    const newFiles = selectedFiles.filter((_, index) => index !== indexToRemove)
+
+    setPreviewUrls(newUrls)
+    setSelectedFiles(newFiles)
 
     if (multiple) {
-      onChange(newFiles.length > 0 ? newFiles.join(',') : null)
+      onChange(newFiles.length > 0 ? newFiles[0] : null) // For now, handle single file
     } else {
       onChange(null)
     }
   }
+
+  // Clean up object URLs on unmount
+  useEffect(() => {
+    return () => {
+      previewUrls.forEach((url) => {
+        if (url.startsWith('blob:')) {
+          URL.revokeObjectURL(url)
+        }
+      })
+    }
+  }, [])
 
   // Don't render anything until mounted to prevent hydration mismatch
   if (!isMounted) {
@@ -225,21 +138,32 @@ export default function ImageUpload({
 
   return (
     <div className={`space-y-4 ${className}`}>
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type='file'
+        accept='image/*'
+        multiple={multiple}
+        onChange={handleFileSelection}
+        className='hidden'
+        disabled={disabled}
+      />
+
       {/* Upload Area */}
       <div className='space-y-2'>
         <div
-          className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+          className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer ${
             disabled
               ? 'border-muted bg-muted/50 cursor-not-allowed'
-              : 'border-border hover:border-primary/50 cursor-pointer'
+              : 'border-border hover:border-primary/50 hover:bg-accent/50'
           }`}
-          onClick={openWidget}
+          onClick={openFileDialog}
         >
           {isLoading ? (
             <div className='flex flex-col items-center space-y-2'>
               <Loader2 className='w-8 h-8 text-primary animate-spin' />
               <p className='text-sm text-muted-foreground'>
-                Uploading to Cloudinary...
+                Processing image...
               </p>
             </div>
           ) : (
@@ -247,7 +171,7 @@ export default function ImageUpload({
               <Upload className='w-8 h-8 text-muted-foreground' />
               <p className='text-sm font-medium'>{placeholder}</p>
               <p className='text-xs text-muted-foreground'>
-                Supports JPG, PNG, GIF up to 10MB • Powered by Cloudinary
+                Supports JPG, PNG, GIF up to 10MB • Click to select files
               </p>
             </div>
           )}
@@ -255,11 +179,11 @@ export default function ImageUpload({
       </div>
 
       {/* Preview Images */}
-      {uploadedFiles.length > 0 && (
+      {previewUrls.length > 0 && (
         <div className='space-y-2'>
-          <p className='text-sm font-medium'>Uploaded Images:</p>
+          <p className='text-sm font-medium'>Selected Images:</p>
           <div className='grid grid-cols-2 md:grid-cols-3 gap-3'>
-            {uploadedFiles.map((url, index) => (
+            {previewUrls.map((url, index) => (
               <div key={`${url}-${index}`} className='relative group'>
                 <div className='aspect-square rounded-lg overflow-hidden bg-muted'>
                   <Image
@@ -273,7 +197,7 @@ export default function ImageUpload({
                 <button
                   onClick={() => removeImage(index)}
                   disabled={disabled}
-                  className='absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50'
+                  className='absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50 hover:bg-destructive/80'
                   type='button'
                 >
                   <X className='w-4 h-4' />
@@ -285,11 +209,11 @@ export default function ImageUpload({
       )}
 
       {/* Upload Instructions */}
-      {uploadedFiles.length === 0 && (
+      {previewUrls.length === 0 && (
         <div className='text-center'>
           <div className='flex items-center justify-center space-x-2 text-muted-foreground'>
             <ImageIcon className='w-4 h-4' />
-            <span className='text-sm'>No images uploaded yet</span>
+            <span className='text-sm'>No images selected yet</span>
           </div>
         </div>
       )}
@@ -297,9 +221,32 @@ export default function ImageUpload({
   )
 }
 
-// Extend window type for TypeScript
-declare global {
-  interface Window {
-    cloudinary: any
+// Helper function to upload file to cloudinary (to be used in form submissions)
+export async function uploadToCloudinary(file: File): Promise<string> {
+  const formData = new FormData()
+  formData.append('file', file)
+  formData.append(
+    'upload_preset',
+    process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'legato_preset',
+  )
+
+  try {
+    const response = await fetch(
+      `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+      {
+        method: 'POST',
+        body: formData,
+      },
+    )
+
+    if (!response.ok) {
+      throw new Error('Failed to upload image')
+    }
+
+    const data = await response.json()
+    return data.secure_url
+  } catch (error) {
+    console.error('Error uploading to Cloudinary:', error)
+    throw error
   }
 }

@@ -16,11 +16,15 @@ import {
   Building,
   Menu,
   X,
+  ClipboardList,
+  LogOut,
 } from 'lucide-react'
 import Image from 'next/image'
 import whiteLogo from '@/public/Legato Landscape.png'
 import blackLogo from '@/public/Legato Landscape Black.png'
 import { useTheme } from 'next-themes'
+import { useRouter } from 'next/navigation'
+import { logout } from '@/lib/auth'
 
 const adminNavItems = [
   { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
@@ -29,6 +33,11 @@ const adminNavItems = [
   { name: 'Gallery', href: '/admin/gallery', icon: ImageIcon },
   { name: 'Events', href: '/admin/events', icon: Calendar },
   { name: 'Testimonials', href: '/admin/testimonials', icon: MessageSquare },
+  {
+    name: 'Feedback Reviews',
+    href: '/admin/feedback-reviews',
+    icon: ClipboardList,
+  },
   { name: 'About Us', href: '/admin/about', icon: Users },
   { name: 'FAQ', href: '/admin/faq', icon: HelpCircle },
   { name: 'Company Info', href: '/admin/company', icon: Building },
@@ -43,6 +52,7 @@ export default function AdminLayout({
   const pathname = usePathname()
   const { theme } = useTheme()
   const [mounted, setMounted] = useState(false)
+  const router = useRouter()
 
   useEffect(() => {
     setMounted(true)
@@ -80,7 +90,10 @@ export default function AdminLayout({
               className='h-6 w-auto'
             />
           </div>
-          <button onClick={() => setSidebarOpen(false)} className='lg:hidden'>
+          <button
+            onClick={() => setSidebarOpen(false)}
+            className='lg:hidden p-2 rounded-lg hover:bg-accent transition-colors'
+          >
             <X className='w-6 h-6' />
           </button>
         </div>
@@ -96,7 +109,7 @@ export default function AdminLayout({
                     href={item.href}
                     className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
                       isActive
-                        ? 'bg-primary text-primary-foreground'
+                        ? 'bg-[hsl(var(--primary))] text-primary-foreground'
                         : 'text-muted-foreground hover:text-foreground hover:bg-accent'
                     }`}
                     onClick={() => setSidebarOpen(false)}
@@ -115,17 +128,37 @@ export default function AdminLayout({
       <div className='lg:pl-64'>
         {/* Top bar */}
         <div className='sticky top-0 z-30 flex items-center justify-between h-16 px-6 bg-background/95 backdrop-blur-sm border-b border-border'>
-          <button onClick={() => setSidebarOpen(true)} className='lg:hidden'>
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className='lg:hidden p-2 rounded-lg hover:bg-accent transition-colors'
+          >
             <Menu className='w-6 h-6' />
           </button>
           <h1 className='text-xl font-display font-bold mt-5'>Legato Admin</h1>
           <div className='flex items-center space-x-4'>
             <Link
               href='/'
-              className='px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors'
+              className='px-4 py-2 bg-[hsl(var(--primary))] text-primary-foreground rounded-lg hover:bg-[hsl(var(--primary))]/90 transition-colors'
             >
               View Site
             </Link>
+            <button
+              onClick={async () => {
+                try {
+                  await fetch('/api/auth/logout', { method: 'POST' })
+                  logout()
+                  router.push('/login')
+                } catch (error) {
+                  console.error('Logout failed:', error)
+                  logout()
+                  router.push('/login')
+                }
+              }}
+              className='px-4 py-2 bg-destructive text-destructive-foreground rounded-lg hover:bg-destructive/90 transition-colors flex items-center space-x-2'
+            >
+              <LogOut className='w-4 h-4' />
+              <span>Logout</span>
+            </button>
           </div>
         </div>
 

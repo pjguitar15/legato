@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight, Star, Quote, User } from 'lucide-react'
 import Image from 'next/image'
+import { SkeletonCard, SkeletonText } from '@/components/ui/skeleton'
 
 interface Testimonial {
   _id: string
@@ -28,7 +29,7 @@ export default function TestimonialsSection() {
     if (testimonials.length > 0) {
       const timer = setInterval(() => {
         setActiveTestimonial((prev) => (prev + 1) % testimonials.length)
-      }, 5000)
+      }, 10000) // Increased from 5000ms to 10000ms (10 seconds)
       return () => clearInterval(timer)
     }
   }, [testimonials.length])
@@ -74,18 +75,10 @@ export default function TestimonialsSection() {
           </div>
 
           {/* Loading Skeleton */}
-          <div className='max-w-4xl mx-auto'>
-            <div className='bg-card rounded-3xl p-8 border animate-pulse'>
-              <div className='flex items-center justify-center mb-6'>
-                <div className='w-20 h-20 bg-muted rounded-full'></div>
-              </div>
-              <div className='text-center space-y-4'>
-                <div className='h-6 bg-muted rounded w-3/4 mx-auto'></div>
-                <div className='h-4 bg-muted rounded w-full'></div>
-                <div className='h-4 bg-muted rounded w-2/3 mx-auto'></div>
-                <div className='h-4 bg-muted rounded w-1/2 mx-auto'></div>
-              </div>
-            </div>
+          <div className='max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8'>
+            {Array.from({ length: 4 }).map((_, index) => (
+              <SkeletonCard key={index} />
+            ))}
           </div>
         </div>
       </section>
@@ -210,7 +203,9 @@ export default function TestimonialsSection() {
                   key={index}
                   onClick={() => setActiveTestimonial(index)}
                   className={`w-3 h-3 rounded-full transition-colors ${
-                    index === activeTestimonial ? 'bg-primary' : 'bg-muted'
+                    index === activeTestimonial
+                      ? 'bg-[hsl(var(--primary))]'
+                      : 'bg-muted'
                   }`}
                 />
               ))}

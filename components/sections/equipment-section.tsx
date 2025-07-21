@@ -1,25 +1,61 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import equipmentData from '@/data/equipment.json'
 import { motion, useInView, type Variants } from 'framer-motion'
 import { useRef } from 'react'
+import { Skeleton } from '@/components/ui/skeleton'
+
+interface EquipmentItem {
+  _id?: string
+  name: string
+  type: string
+  description: string
+  image?: string
+  features: string[]
+  brand: string
+}
+
+interface EquipmentCategory {
+  _id?: string
+  name: string
+  items: EquipmentItem[]
+}
 
 export default function EquipmentSection() {
   const [activeCategory, setActiveCategory] = useState(0)
+  const [equipmentData, setEquipmentData] = useState<EquipmentCategory[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: '-100px' })
 
+  useEffect(() => {
+    fetchEquipment()
+  }, [])
+
+  const fetchEquipment = async () => {
+    try {
+      setIsLoading(true)
+      const response = await fetch('/api/admin/equipment')
+      const data = await response.json()
+
+      if (data.success && data.data) {
+        setEquipmentData(data.data)
+      }
+    } catch (error) {
+      console.error('Error fetching equipment:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const nextCategory = () => {
-    setActiveCategory((prev) => (prev + 1) % equipmentData.categories.length)
+    setActiveCategory((prev) => (prev + 1) % equipmentData.length)
   }
 
   const prevCategory = () => {
     setActiveCategory(
-      (prev) =>
-        (prev - 1 + equipmentData.categories.length) %
-        equipmentData.categories.length,
+      (prev) => (prev - 1 + equipmentData.length) % equipmentData.length,
     )
   }
 
@@ -47,6 +83,41 @@ export default function EquipmentSection() {
       scale: 1.05,
       transition: { duration: 0.3, ease: 'easeOut' },
     },
+  }
+
+  if (isLoading) {
+    return (
+      <section id='equipment' className='py-20' ref={ref}>
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+          <div className='text-center mb-16'>
+            <Skeleton className='h-12 w-96 mx-auto mb-6' />
+            <Skeleton className='h-6 w-2/3 mx-auto' />
+          </div>
+          <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
+            {Array.from({ length: 6 }).map((_, i) => (
+              <Skeleton key={i} className='h-64 w-full rounded-xl' />
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  if (!equipmentData || equipmentData.length === 0) {
+    return (
+      <section id='equipment' className='py-20' ref={ref}>
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+          <div className='text-center'>
+            <h2 className='text-4xl sm:text-5xl font-display font-bold mb-6'>
+              Our <span className='text-gradient'>Equipment</span>
+            </h2>
+            <p className='text-xl text-muted-foreground'>
+              No equipment data available at the moment.
+            </p>
+          </div>
+        </div>
+      </section>
+    )
   }
 
   return (
@@ -89,7 +160,7 @@ export default function EquipmentSection() {
             className='flex space-x-4 bg-bg-[hsl(var(--secondary)/0.5)]
  rounded-xl p-2'
           >
-            {equipmentData.categories.map((category, index) => (
+            {equipmentData.map((category, index) => (
               <motion.button
                 key={index}
                 onClick={() => setActiveCategory(index)}
@@ -121,10 +192,10 @@ export default function EquipmentSection() {
             animate={isInView ? 'visible' : 'hidden'}
             key={activeCategory} // This will trigger re-animation when category changes
           >
-            {equipmentData.categories[activeCategory].items.map(
-              (item, index) => (
+            {equipmentData[activeCategory]?.items?.map(
+              (item: EquipmentItem, index: number) => (
                 <motion.div
-                  key={item.id}
+                  key={item._id || index}
                   className='bg-card rounded-2xl overflow-hidden border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-xl'
                   variants={cardVariants}
                   whileHover='hover'
@@ -194,7 +265,7 @@ export default function EquipmentSection() {
 
                     {/* Features */}
                     <div className='space-y-2'>
-                      {item.features.map((feature, idx) => (
+                      {item.features.map((feature: string, idx: number) => (
                         <motion.div
                           key={idx}
                           className='flex items-center space-x-2'

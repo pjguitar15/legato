@@ -196,7 +196,7 @@ How can we help make your event LEGENDARY? Just ask about:
 • Pricing
 • Coverage areas
 
-&quot;Turn It Up to 11!&quot; 🎵🔥`
+        🎵🔥`
   } else {
     response = `🎵 Thanks for contacting Legato Sounds and Lights! 
 

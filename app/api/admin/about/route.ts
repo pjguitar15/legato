@@ -3,12 +3,19 @@ import connectToDatabase from '@/lib/mongodb'
 import About from '@/models/About'
 
 export async function GET() {
+  console.log('📡 GET /api/admin/about called')
   try {
+    console.log('📁 Connecting to database...')
     await connectToDatabase()
+    console.log('✅ Database connected, searching for About data...')
+
     const about = await About.findOne()
+    console.log('📊 About data found:', about ? 'Yes' : 'No')
+    console.log('📋 About data details:', about)
+
     return NextResponse.json({ success: true, data: about })
   } catch (error) {
-    console.error('Error fetching about:', error)
+    console.error('❌ Error fetching about:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch about' },
       { status: 500 },

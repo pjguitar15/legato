@@ -22,15 +22,13 @@ export default function LoginPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(credentials),
+        credentials: 'include', // Include cookies
       })
 
       const data = await response.json()
 
       if (data.success) {
-        // Store token in localStorage
-        localStorage.setItem('adminToken', data.token)
-
-        // Redirect to admin dashboard
+        // Redirect to admin dashboard (token is now in HTTP-only cookie)
         router.push('/admin')
       } else {
         setError(data.error || 'Login failed')
@@ -117,18 +115,11 @@ export default function LoginPage() {
             <button
               type='submit'
               disabled={isLoading}
-              className='w-full bg-primary text-primary-foreground py-3 rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+              className='w-full bg-[hsl(var(--primary))] text-primary-foreground py-3 rounded-lg hover:bg-[hsl(var(--primary))]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
             >
               {isLoading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
-
-          {/* Demo Credentials */}
-          <div className='mt-6 pt-6 border-t border-border'>
-            <p className='text-sm text-muted-foreground text-center'>
-              Demo Credentials: <strong>admin</strong> / <strong>admin</strong>
-            </p>
-          </div>
         </div>
 
         {/* Back to Site */}

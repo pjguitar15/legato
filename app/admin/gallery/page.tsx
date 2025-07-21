@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { Plus, Edit, Trash2, ImageIcon, MapPin, Calendar } from 'lucide-react'
 import AuthGuard from '@/components/admin/auth-guard'
 import Image from 'next/image'
-import ImageUpload from '@/components/ui/image-upload'
+import ImageUpload, { uploadToCloudinary } from '@/components/ui/image-upload'
 import ClientGuard from '@/components/admin/client-guard'
 
 interface GalleryItem {
@@ -29,6 +29,7 @@ export default function GalleryAdmin() {
     location: '',
     date: '',
   })
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
   useEffect(() => {
     fetchGallery()
@@ -55,6 +56,18 @@ export default function GalleryAdmin() {
     setIsSubmitting(true)
 
     try {
+      let imageUrl = formData.url
+
+      // If a new file is selected, upload it to Cloudinary
+      if (selectedFile) {
+        imageUrl = await uploadToCloudinary(selectedFile)
+      }
+
+      const payload = {
+        ...formData,
+        url: imageUrl,
+      }
+
       const method = editingItem ? 'PUT' : 'POST'
       const url = editingItem
         ? `/api/admin/gallery/${editingItem._id}`
@@ -65,7 +78,7 @@ export default function GalleryAdmin() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       })
 
       const data = await response.json()
@@ -122,6 +135,7 @@ export default function GalleryAdmin() {
       location: '',
       date: '',
     })
+    setSelectedFile(null)
     setEditingItem(null)
   }
 
@@ -165,7 +179,7 @@ export default function GalleryAdmin() {
           </div>
           <button
             onClick={() => setShowForm(true)}
-            className='bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors flex items-center space-x-2'
+            className='bg-[hsl(var(--primary))] text-primary-foreground px-4 py-2 rounded-lg hover:bg-[hsl(var(--primary))]/90 transition-colors flex items-center space-x-2'
           >
             <Plus className='w-4 h-4' />
             <span>Add Image</span>
@@ -186,7 +200,7 @@ export default function GalleryAdmin() {
             </p>
             <button
               onClick={() => setShowForm(true)}
-              className='px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors'
+              className='px-4 py-2 bg-[hsl(var(--primary))] text-primary-foreground rounded-lg hover:bg-[hsl(var(--primary))]/90 transition-colors'
             >
               Add First Image
             </button>
@@ -231,7 +245,7 @@ export default function GalleryAdmin() {
 
                   {/* Event Type */}
                   <div className='mb-3'>
-                    <span className='px-2 py-1 bg-primary/20 text-primary text-xs rounded-full'>
+                    <span className='px-2 py-1 bg-[hsl(var(--primary))]/20 text-primary text-xs rounded-full'>
                       {item.eventType}
                     </span>
                   </div>
@@ -281,10 +295,15 @@ export default function GalleryAdmin() {
                     </label>
                     <ClientGuard>
                       <ImageUpload
-                        value={formData.url}
-                        onChange={(url) =>
-                          setFormData({ ...formData, url: url || '' })
-                        }
+                        value={selectedFile || formData.url}
+                        onChange={(fileOrUrl) => {
+                          if (fileOrUrl instanceof File) {
+                            setSelectedFile(fileOrUrl)
+                          } else {
+                            setFormData({ ...formData, url: fileOrUrl || '' })
+                            setSelectedFile(null)
+                          }
+                        }}
                         disabled={isSubmitting}
                         placeholder='Upload gallery image'
                       />
@@ -369,7 +388,7 @@ export default function GalleryAdmin() {
                     <button
                       type='submit'
                       disabled={isSubmitting}
-                      className='bg-primary text-primary-foreground px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50'
+                      className='bg-[hsl(var(--primary))] text-primary-foreground px-6 py-2 rounded-lg hover:bg-[hsl(var(--primary))]/90 transition-colors disabled:opacity-50'
                     >
                       {isSubmitting
                         ? editingItem

@@ -46,7 +46,13 @@ export default function PackagesPage() {
       const data = await response.json()
 
       if (data.success) {
-        setPackages(data.data)
+        const packagesWithDefaults =
+          data.data?.map((pkg: any) => ({
+            ...pkg,
+            features: pkg.features || [],
+            equipment: pkg.equipment || [],
+          })) || []
+        setPackages(packagesWithDefaults)
       }
     } catch (error) {
       console.error('Error fetching packages:', error)
@@ -220,7 +226,7 @@ export default function PackagesPage() {
           </div>
           <button
             onClick={() => setShowForm(true)}
-            className='flex items-center space-x-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors'
+            className='flex items-center space-x-2 px-4 py-2 bg-[hsl(var(--primary))] text-primary-foreground rounded-lg hover:bg-[hsl(var(--primary))]/90 transition-colors'
           >
             <Plus className='w-4 h-4' />
             <span>Add Package</span>
@@ -240,7 +246,7 @@ export default function PackagesPage() {
             </p>
             <button
               onClick={() => setShowForm(true)}
-              className='px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors'
+              className='px-4 py-2 bg-[hsl(var(--primary))] text-primary-foreground rounded-lg hover:bg-[hsl(var(--primary))]/90 transition-colors'
             >
               Add First Package
             </button>
@@ -259,7 +265,7 @@ export default function PackagesPage() {
                   <div>
                     <h3 className='text-xl font-semibold'>{pkg.name}</h3>
                     {pkg.popular && (
-                      <span className='inline-block px-2 py-1 bg-primary text-primary-foreground text-xs rounded-full mt-1'>
+                      <span className='inline-block px-2 py-1 bg-[hsl(var(--primary))] text-primary-foreground text-xs rounded-full mt-1'>
                         Popular
                       </span>
                     )}
@@ -306,22 +312,22 @@ export default function PackagesPage() {
                     <Users className='w-4 h-4' />
                     <span>Max {pkg.maxGuests} guests</span>
                   </div>
-                  <span>{pkg.features.length} features</span>
+                  <span>{pkg.features?.length || 0} features</span>
                 </div>
 
                 {/* Features Preview */}
                 <div className='mb-4'>
                   <h4 className='font-medium text-sm mb-2'>Key Features:</h4>
                   <ul className='text-sm text-muted-foreground space-y-1'>
-                    {pkg.features.slice(0, 3).map((feature, index) => (
+                    {pkg.features?.slice(0, 3).map((feature, index) => (
                       <li key={index} className='flex items-start space-x-2'>
-                        <span className='w-1 h-1 bg-primary rounded-full mt-2 flex-shrink-0'></span>
+                        <span className='w-1 h-1 bg-[hsl(var(--primary))] rounded-full mt-2 flex-shrink-0'></span>
                         <span>{feature}</span>
                       </li>
                     ))}
-                    {pkg.features.length > 3 && (
+                    {(pkg.features?.length || 0) > 3 && (
                       <li className='text-xs italic'>
-                        +{pkg.features.length - 3} more features
+                        +{(pkg.features?.length || 0) - 3} more features
                       </li>
                     )}
                   </ul>
@@ -586,7 +592,7 @@ export default function PackagesPage() {
                     <button
                       type='submit'
                       disabled={isSubmitting}
-                      className='bg-primary text-primary-foreground px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50'
+                      className='bg-[hsl(var(--primary))] text-primary-foreground px-6 py-2 rounded-lg hover:bg-[hsl(var(--primary))]/90 transition-colors disabled:opacity-50'
                     >
                       {isSubmitting
                         ? editingPackage

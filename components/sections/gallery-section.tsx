@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { X, ChevronLeft, ChevronRight, Play, ImageIcon } from 'lucide-react'
 import Image from 'next/image'
+import { SkeletonGallery, SkeletonText } from '@/components/ui/skeleton'
 
 interface GalleryItem {
   _id: string
@@ -90,16 +91,7 @@ export default function GallerySection() {
           {/* Loading Skeleton */}
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
             {Array.from({ length: 6 }).map((_, index) => (
-              <div
-                key={index}
-                className='bg-card rounded-xl overflow-hidden border animate-pulse'
-              >
-                <div className='aspect-video bg-muted'></div>
-                <div className='p-4'>
-                  <div className='h-4 bg-muted rounded w-3/4 mb-2'></div>
-                  <div className='h-3 bg-muted rounded w-1/2'></div>
-                </div>
-              </div>
+              <SkeletonGallery key={index} />
             ))}
           </div>
         </div>
@@ -157,10 +149,10 @@ export default function GallerySection() {
                 <button
                   key={type}
                   onClick={() => setFilter(type)}
-                  className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
+                  className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                     filter === type
-                      ? 'bg-primary text-primary-foreground shadow-md'
-                      : 'text-muted-foreground hover:text-foreground'
+                      ? 'bg-[hsl(var(--primary))] text-primary-foreground shadow-md'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
                   }`}
                 >
                   {type === 'all' ? 'All Events' : type}
@@ -222,7 +214,7 @@ export default function GallerySection() {
             </p>
             <button
               onClick={() => setFilter('all')}
-              className='bg-primary text-primary-foreground px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors'
+              className='bg-[hsl(var(--primary))] text-primary-foreground px-6 py-2 rounded-lg hover:bg-[hsl(var(--primary))]/90 transition-colors'
             >
               View All Events
             </button>

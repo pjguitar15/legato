@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { MessageCircle, Phone, Music, Zap, Volume2 } from 'lucide-react'
-import companyData from '@/data/company.json'
+import { useCompanyData } from '@/hooks/use-company-data'
+import { SkeletonHero } from '@/components/ui/skeleton'
 import Image from 'next/image'
 import heroBg1 from '@/public/hero-bg.jpg'
 import heroBg2 from '@/public/hero-bg-2.jpg'
@@ -15,6 +16,7 @@ import { motion, AnimatePresence, type Variants } from 'framer-motion'
 
 export default function HeroSection() {
   const [currentSlide, setCurrentSlide] = useState(0)
+  const { companyData, isLoading } = useCompanyData()
 
   const heroImages = [
     heroBg1,
@@ -34,15 +36,15 @@ export default function HeroSection() {
   }, [heroImages.length])
 
   const handleMessenger = () => {
-    window.open(companyData.contact.messenger, '_blank')
-  }
-
-  const handleFacebookMessenger = () => {
-    window.open(`https://m.me/${companyData.contact.facebookPageId}`, '_blank')
+    if (companyData?.socialMedia?.messenger) {
+      window.open(companyData.socialMedia.messenger, '_blank')
+    }
   }
 
   const handleCall = () => {
-    window.open(`tel:${companyData.contact.phone}`, '_self')
+    if (companyData?.contact?.phone) {
+      window.open(`tel:${companyData.contact.phone}`, '_self')
+    }
   }
 
   // Animation variants for Framer Motion
@@ -91,6 +93,29 @@ export default function HeroSection() {
       scale: 0.95,
     },
   }
+
+  if (isLoading) {
+    return (
+      <section
+        id='home'
+        className='relative min-h-screen flex items-center justify-center overflow-hidden bg-black'
+      >
+        <div className='absolute inset-0'>
+          <Image
+            src={heroImages[0]}
+            alt='Loading'
+            className='w-full h-full object-cover'
+          />
+          <div className='absolute inset-0 bg-black/70' />
+        </div>
+        <div className='relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+          <SkeletonHero />
+        </div>
+      </section>
+    )
+  }
+
+  if (!companyData) return null
 
   return (
     <section
@@ -158,7 +183,8 @@ export default function HeroSection() {
             variants={itemVariants}
             className='text-lg text-gray-300 mb-8 max-w-3xl mx-auto'
           >
-            {companyData.coverage}
+            {companyData?.coverage ||
+              'Serving Rock Bands & Live Music Events - Cavite, Metro Manila, and Nearby Areas'}
           </motion.p>
 
           {/* Rock Icons with Framer Motion */}
@@ -182,7 +208,7 @@ export default function HeroSection() {
             variants={itemVariants}
             className='grid grid-cols-1 sm:grid-cols-3 gap-8 mb-12 max-w-2xl mx-auto'
           >
-            {companyData.stats.map((stat, index) => (
+            {companyData.stats?.map((stat, index) => (
               <motion.div
                 key={index}
                 variants={itemVariants}
@@ -213,16 +239,7 @@ export default function HeroSection() {
               <MessageCircle className='w-6 h-6' />
               <span>Book Your Show - Messenger</span>
             </motion.button>
-            <motion.button
-              variants={buttonVariants}
-              whileHover='hover'
-              whileTap='tap'
-              onClick={handleFacebookMessenger}
-              className='bg-blue-600 text-white px-8 py-4 rounded-xl hover:bg-blue-700 transition-all duration-300 flex items-center space-x-3 text-lg font-bold'
-            >
-              <MessageCircle className='w-6 h-6' />
-              <span>Messenger</span>
-            </motion.button>
+
             <motion.button
               variants={buttonVariants}
               whileHover='hover'
@@ -245,9 +262,7 @@ export default function HeroSection() {
                 repeat: Infinity,
                 repeatType: 'reverse',
               }}
-            >
-              &quot;Turn It Up to 11!&quot; 🤘
-            </motion.p>
+            ></motion.p>
           </motion.div>
 
           {/* Scroll Indicator with Framer Motion */}

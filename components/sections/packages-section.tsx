@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { Check, Star, MessageCircle } from 'lucide-react'
-import companyData from '@/data/company.json'
+import { SkeletonPackage, SkeletonText } from '@/components/ui/skeleton'
 
 interface Package {
   _id: string
@@ -42,7 +42,7 @@ export default function PackagesSection() {
   }
 
   const handleMessenger = () => {
-    window.open(companyData.contact.messenger, '_blank')
+    // window.open(companyData.contact.messenger, '_blank')
   }
 
   if (isLoading) {
@@ -62,21 +62,7 @@ export default function PackagesSection() {
           {/* Loading Skeleton */}
           <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
             {Array.from({ length: 3 }).map((_, index) => (
-              <div
-                key={index}
-                className='bg-card rounded-2xl p-8 border animate-pulse'
-              >
-                <div className='h-6 bg-muted rounded w-3/4 mb-4'></div>
-                <div className='h-4 bg-muted rounded w-full mb-2'></div>
-                <div className='h-4 bg-muted rounded w-2/3 mb-6'></div>
-                <div className='h-8 bg-muted rounded w-1/2 mb-6'></div>
-                <div className='space-y-2 mb-6'>
-                  {Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i} className='h-4 bg-muted rounded w-full'></div>
-                  ))}
-                </div>
-                <div className='h-10 bg-muted rounded w-full'></div>
-              </div>
+              <SkeletonPackage key={index} />
             ))}
           </div>
         </div>
@@ -157,7 +143,7 @@ export default function PackagesSection() {
                         key={index}
                         className='text-xs text-muted-foreground flex items-center'
                       >
-                        <span className='w-1.5 h-1.5 bg-primary rounded-full mr-2'></span>
+                        <span className='w-1.5 h-1.5 bg-[hsl(var(--primary))] rounded-full mr-2'></span>
                         {item}
                       </div>
                     ))}
@@ -176,7 +162,7 @@ export default function PackagesSection() {
                 className={`w-full py-3 px-6 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center space-x-2 ${
                   pkg.popular
                     ? 'bg-gradient-to-r from-emerald-400 to-emerald-600 text-white hover:from-emerald-500 hover:to-emerald-700 shadow-lg hover:shadow-xl'
-                    : 'bg-primary text-primary-foreground hover:bg-primary/90'
+                    : 'bg-[hsl(var(--primary))] text-primary-foreground hover:bg-[hsl(var(--primary))]/90'
                 }`}
               >
                 <MessageCircle className='w-4 h-4' />

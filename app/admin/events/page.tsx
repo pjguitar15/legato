@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { Plus, Edit, Trash2, Calendar, MapPin } from 'lucide-react'
 import AuthGuard from '@/components/admin/auth-guard'
 import Image from 'next/image'
-import ImageUpload from '@/components/ui/image-upload'
+import ImageUpload, { uploadToCloudinary } from '@/components/ui/image-upload'
 import ClientGuard from '@/components/admin/client-guard'
 
 interface Event {
@@ -35,6 +35,7 @@ export default function EventsAdmin() {
     image: '',
     highlights: [''],
   })
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
   useEffect(() => {
     fetchEvents()
@@ -47,7 +48,12 @@ export default function EventsAdmin() {
       const data = await response.json()
 
       if (data.success) {
-        setEvents(data.data)
+        const eventsWithDefaults =
+          data.data?.map((event: any) => ({
+            ...event,
+            highlights: event.highlights || [],
+          })) || []
+        setEvents(eventsWithDefaults)
       }
     } catch (error) {
       console.error('Error fetching events:', error)
@@ -61,15 +67,23 @@ export default function EventsAdmin() {
     setIsSubmitting(true)
 
     try {
+      let imageUrl = formData.image
+
+      // If a new file is selected, upload it to Cloudinary
+      if (selectedFile) {
+        imageUrl = await uploadToCloudinary(selectedFile)
+      }
+
+      const payload = {
+        ...formData,
+        image: imageUrl,
+        highlights: formData.highlights.filter((h) => h.trim() !== ''),
+      }
+
       const method = editingEvent ? 'PUT' : 'POST'
       const url = editingEvent
         ? `/api/admin/events/${editingEvent._id}`
         : '/api/admin/events'
-
-      const payload = {
-        ...formData,
-        highlights: formData.highlights.filter((h) => h.trim() !== ''),
-      }
 
       const response = await fetch(url, {
         method,
@@ -139,6 +153,7 @@ export default function EventsAdmin() {
       image: '',
       highlights: [''],
     })
+    setSelectedFile(null)
     setEditingEvent(null)
   }
 
@@ -197,7 +212,7 @@ export default function EventsAdmin() {
           </div>
           <button
             onClick={() => setShowForm(true)}
-            className='bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors flex items-center space-x-2'
+            className='bg-[hsl(var(--primary))] text-primary-foreground px-4 py-2 rounded-lg hover:bg-[hsl(var(--primary))]/90 transition-colors flex items-center space-x-2'
           >
             <Plus className='w-4 h-4' />
             <span>Add Event</span>
@@ -216,7 +231,7 @@ export default function EventsAdmin() {
             </p>
             <button
               onClick={() => setShowForm(true)}
-              className='px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors'
+              className='px-4 py-2 bg-[hsl(var(--primary))] text-primary-foreground rounded-lg hover:bg-[hsl(var(--primary))]/90 transition-colors'
             >
               Add First Event
             </button>
@@ -279,7 +294,7 @@ export default function EventsAdmin() {
                     <span className='px-2 py-1 bg-secondary text-secondary-foreground text-xs rounded-full'>
                       {event.eventType}
                     </span>
-                    <span className='px-2 py-1 bg-primary/20 text-primary text-xs rounded-full'>
+                    <span className='px-2 py-1 bg-[hsl(var(--primary))]/20 text-primary text-xs rounded-full'>
                       {event.package}
                     </span>
                   </div>
@@ -301,7 +316,7 @@ export default function EventsAdmin() {
                               key={index}
                               className='flex items-start space-x-2'
                             >
-                              <span className='w-1 h-1 bg-primary rounded-full mt-1.5 flex-shrink-0'></span>
+                              <span className='w-1 h-1 bg-[hsl(var(--primary))] rounded-full mt-1.5 flex-shrink-0'></span>
                               <span>{highlight}</span>
                             </li>
                           ))}
@@ -452,10 +467,15 @@ export default function EventsAdmin() {
                     </label>
                     <ClientGuard>
                       <ImageUpload
-                        value={formData.image}
-                        onChange={(url) =>
-                          setFormData({ ...formData, image: url || '' })
-                        }
+                        value={selectedFile || formData.image}
+                        onChange={(fileOrUrl) => {
+                          if (fileOrUrl instanceof File) {
+                            setSelectedFile(fileOrUrl)
+                          } else {
+                            setFormData({ ...formData, image: fileOrUrl || '' })
+                            setSelectedFile(null)
+                          }
+                        }}
                         disabled={isSubmitting}
                         placeholder='Upload event photo'
                       />
@@ -517,7 +537,7 @@ export default function EventsAdmin() {
                     <button
                       type='submit'
                       disabled={isSubmitting}
-                      className='bg-primary text-primary-foreground px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50'
+                      className='bg-[hsl(var(--primary))] text-primary-foreground px-6 py-2 rounded-lg hover:bg-[hsl(var(--primary))]/90 transition-colors disabled:opacity-50'
                     >
                       {isSubmitting
                         ? editingEvent

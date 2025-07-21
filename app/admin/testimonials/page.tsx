@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { Plus, Edit, Trash2, Star, User } from 'lucide-react'
 import AuthGuard from '@/components/admin/auth-guard'
 import Image from 'next/image'
-import ImageUpload from '@/components/ui/image-upload'
+import ImageUpload, { uploadToCloudinary } from '@/components/ui/image-upload'
 import ClientGuard from '@/components/admin/client-guard'
 
 interface Testimonial {
@@ -25,6 +25,8 @@ export default function TestimonialsAdmin() {
   const [editingTestimonial, setEditingTestimonial] =
     useState<Testimonial | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [uploadingImage, setUploadingImage] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
     event: '',
@@ -60,30 +62,58 @@ export default function TestimonialsAdmin() {
     setIsSubmitting(true)
 
     try {
+      let imageUrl = formData.image
+
+      // Upload image to Cloudinary if a new file is selected
+      if (selectedFile) {
+        setUploadingImage(true)
+        try {
+          imageUrl = await uploadToCloudinary(selectedFile)
+          console.log('✅ Image uploaded to Cloudinary:', imageUrl)
+        } catch (error) {
+          console.error('❌ Error uploading image:', error)
+          alert('Failed to upload image. Please try again.')
+          setUploadingImage(false)
+          setIsSubmitting(false)
+          return
+        } finally {
+          setUploadingImage(false)
+        }
+      }
+
       const method = editingTestimonial ? 'PUT' : 'POST'
       const url = editingTestimonial
         ? `/api/admin/testimonials/${editingTestimonial._id}`
         : '/api/admin/testimonials'
+
+      const payload = {
+        ...formData,
+        image: imageUrl,
+      }
+
+      console.log('📝 Submitting testimonial with data:', payload)
 
       const response = await fetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       })
 
       const data = await response.json()
 
       if (data.success) {
+        console.log('✅ Testimonial saved successfully')
         await fetchTestimonials() // Refresh the list
         setShowForm(false)
         resetForm()
       } else {
+        console.error('❌ Error response:', data)
         alert(`Error: ${data.error}`)
       }
     } catch (error) {
-      console.error('Error saving testimonial:', error)
+      console.error('❌ Error saving testimonial:', error)
       alert('Failed to save testimonial')
     } finally {
       setIsSubmitting(false)
@@ -101,6 +131,8 @@ export default function TestimonialsAdmin() {
       date: testimonial.date,
       image: testimonial.image || '',
     })
+    setSelectedFile(null) // Reset selected file when editing
+    setUploadingImage(false)
     setShowForm(true)
   }
 
@@ -131,6 +163,8 @@ export default function TestimonialsAdmin() {
       date: '',
       image: '',
     })
+    setSelectedFile(null)
+    setUploadingImage(false)
     setEditingTestimonial(null)
   }
 
@@ -179,7 +213,7 @@ export default function TestimonialsAdmin() {
           </div>
           <button
             onClick={() => setShowForm(true)}
-            className='bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors flex items-center space-x-2'
+            className='bg-[hsl(var(--primary))] text-primary-foreground px-4 py-2 rounded-lg hover:bg-[hsl(var(--primary))]/90 transition-colors flex items-center space-x-2'
           >
             <Plus className='w-4 h-4' />
             <span>Add Testimonial</span>
@@ -201,7 +235,7 @@ export default function TestimonialsAdmin() {
             </p>
             <button
               onClick={() => setShowForm(true)}
-              className='px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors'
+              className='px-4 py-2 bg-[hsl(var(--primary))] text-primary-foreground rounded-lg hover:bg-[hsl(var(--primary))]/90 transition-colors'
             >
               Add First Testimonial
             </button>
@@ -258,7 +292,7 @@ export default function TestimonialsAdmin() {
 
                 {/* Rating */}
                 <div className='flex mb-3'>
-                  {[...Array(testimonial.rating)].map((_, i) => (
+                  {[...Array(testimonial.rating || 0)].map((_, i) => (
                     <Star
                       key={i}
                       className='w-4 h-4 text-yellow-400 fill-current'
@@ -418,14 +452,25 @@ export default function TestimonialsAdmin() {
                     </label>
                     <ClientGuard>
                       <ImageUpload
-                        value={formData.image}
-                        onChange={(url) =>
-                          setFormData({ ...formData, image: url || '' })
-                        }
-                        disabled={isSubmitting}
+                        value={selectedFile || formData.image}
+                        onChange={(fileOrUrl) => {
+                          if (fileOrUrl instanceof File) {
+                            setSelectedFile(fileOrUrl)
+                            setFormData({ ...formData, image: '' }) // Clear existing image URL
+                          } else {
+                            setSelectedFile(null)
+                            setFormData({ ...formData, image: fileOrUrl || '' })
+                          }
+                        }}
+                        disabled={isSubmitting || uploadingImage}
                         placeholder='Upload customer photo'
                       />
                     </ClientGuard>
+                    {uploadingImage && (
+                      <p className='text-xs text-muted-foreground mt-1'>
+                        Uploading image...
+                      </p>
+                    )}
                   </div>
 
                   <div className='flex justify-end space-x-4 pt-4 border-t border-border'>
@@ -443,7 +488,7 @@ export default function TestimonialsAdmin() {
                     <button
                       type='submit'
                       disabled={isSubmitting}
-                      className='bg-primary text-primary-foreground px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50'
+                      className='bg-[hsl(var(--primary))] text-primary-foreground px-6 py-2 rounded-lg hover:bg-[hsl(var(--primary))]/90 transition-colors disabled:opacity-50'
                     >
                       {isSubmitting
                         ? editingTestimonial

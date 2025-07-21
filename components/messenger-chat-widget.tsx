@@ -20,7 +20,8 @@ declare global {
 }
 
 export default function MessengerChatWidget({
-  pageId = process.env.NEXT_PUBLIC_FACEBOOK_PAGE_ID,
+  pageId = process.env.NEXT_PUBLIC_FACEBOOK_PAGE_ID ||
+    'legatosoundsandlightsrental',
   minimized = true,
   themeColor = '#10b981', // Legato's primary green color
 }: MessengerChatWidgetProps) {

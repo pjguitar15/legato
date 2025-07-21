@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { Plus, Edit, Trash2, Tag, Wrench } from 'lucide-react'
 import AuthGuard from '@/components/admin/auth-guard'
-import ImageUpload from '@/components/ui/image-upload'
+import ImageUpload, { uploadToCloudinary } from '@/components/ui/image-upload'
 import ClientGuard from '@/components/admin/client-guard'
 
 interface EquipmentItem {
@@ -41,6 +41,7 @@ export default function EquipmentAdmin() {
       },
     ],
   })
+  const [selectedFiles, setSelectedFiles] = useState<(File | null)[]>([null])
 
   useEffect(() => {
     fetchEquipment()
@@ -53,7 +54,16 @@ export default function EquipmentAdmin() {
       const data = await response.json()
 
       if (data.success) {
-        setCategories(data.data)
+        const categoriesWithDefaults =
+          data.data?.map((category: EquipmentCategory) => ({
+            ...category,
+            items:
+              category.items?.map((item: EquipmentItem) => ({
+                ...item,
+                features: item.features || [],
+              })) || [],
+          })) || []
+        setCategories(categoriesWithDefaults)
       }
     } catch (error) {
       console.error('Error fetching equipment:', error)
@@ -67,18 +77,33 @@ export default function EquipmentAdmin() {
     setIsSubmitting(true)
 
     try {
+      // Upload any new files to Cloudinary
+      const itemsWithImages = await Promise.all(
+        formData.items.map(async (item, index) => {
+          let imageUrl = item.image
+
+          // If a new file is selected for this item, upload it
+          if (selectedFiles[index]) {
+            imageUrl = await uploadToCloudinary(selectedFiles[index]!)
+          }
+
+          return {
+            ...item,
+            image: imageUrl,
+            features: item.features.filter((f) => f.trim() !== ''),
+          }
+        }),
+      )
+
+      const payload = {
+        ...formData,
+        items: itemsWithImages,
+      }
+
       const method = editingCategory ? 'PUT' : 'POST'
       const url = editingCategory
         ? `/api/admin/equipment/${editingCategory._id}`
         : '/api/admin/equipment'
-
-      const payload = {
-        ...formData,
-        items: formData.items.map((item) => ({
-          ...item,
-          features: item.features.filter((f) => f.trim() !== ''),
-        })),
-      }
 
       const response = await fetch(url, {
         method,
@@ -115,6 +140,7 @@ export default function EquipmentAdmin() {
         image: item.image || '',
       })),
     })
+    setSelectedFiles(new Array(category.items.length).fill(null))
     setShowForm(true)
   }
 
@@ -150,6 +176,7 @@ export default function EquipmentAdmin() {
         },
       ],
     })
+    setSelectedFiles([null])
     setEditingCategory(null)
   }
 
@@ -169,6 +196,7 @@ export default function EquipmentAdmin() {
         },
       ],
     })
+    setSelectedFiles([...selectedFiles, null])
   }
 
   const removeItem = (index: number) => {
@@ -176,6 +204,7 @@ export default function EquipmentAdmin() {
       ...formData,
       items: formData.items.filter((_, i) => i !== index),
     })
+    setSelectedFiles(selectedFiles.filter((_, i) => i !== index))
   }
 
   const updateItem = (index: number, field: string, value: string) => {
@@ -249,7 +278,7 @@ export default function EquipmentAdmin() {
           </div>
           <button
             onClick={() => setShowForm(true)}
-            className='bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors flex items-center space-x-2'
+            className='bg-[hsl(var(--primary))] text-primary-foreground px-4 py-2 rounded-lg hover:bg-[hsl(var(--primary))]/90 transition-colors flex items-center space-x-2'
           >
             <Plus className='w-4 h-4' />
             <span>Add Category</span>
@@ -270,7 +299,7 @@ export default function EquipmentAdmin() {
             </p>
             <button
               onClick={() => setShowForm(true)}
-              className='px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors'
+              className='px-4 py-2 bg-[hsl(var(--primary))] text-primary-foreground rounded-lg hover:bg-[hsl(var(--primary))]/90 transition-colors'
             >
               Add First Category
             </button>
@@ -313,54 +342,84 @@ export default function EquipmentAdmin() {
                   {category.items.map((item, index) => (
                     <div
                       key={index}
-                      className='bg-secondary/30 rounded-lg p-4 border border-border/50'
+                      className='bg-secondary/30 rounded-lg border border-border/50 overflow-hidden'
                     >
-                      <div className='flex items-start justify-between mb-3'>
-                        <div className='flex-1'>
-                          <h3 className='font-semibold'>{item.name}</h3>
-                          <div className='flex items-center space-x-2 mt-1'>
-                            <span className='px-2 py-1 bg-primary/20 text-primary text-xs rounded-full'>
-                              {item.brand}
-                            </span>
-                            <div className='flex items-center space-x-1'>
-                              <Tag className='w-3 h-3 text-muted-foreground' />
-                              <span className='text-xs text-muted-foreground'>
-                                {item.type}
+                      {/* Equipment Image */}
+                      <div className='aspect-video bg-muted relative overflow-hidden'>
+                        {item.image ? (
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className='w-full h-full object-cover'
+                            onError={(e) => {
+                              // Fallback to placeholder if image fails to load
+                              e.currentTarget.style.display = 'none'
+                              e.currentTarget.nextElementSibling?.classList.remove(
+                                'hidden',
+                              )
+                            }}
+                          />
+                        ) : null}
+                        {!item.image && (
+                          <div className='w-full h-full flex items-center justify-center bg-gradient-to-br from-muted/50 to-muted'>
+                            <div className='text-center'>
+                              <Wrench className='w-8 h-8 text-muted-foreground mx-auto mb-2' />
+                              <p className='text-xs text-muted-foreground'>
+                                No image
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className='p-4'>
+                        <div className='flex items-start justify-between mb-3'>
+                          <div className='flex-1'>
+                            <h3 className='font-semibold'>{item.name}</h3>
+                            <div className='flex items-center space-x-2 mt-1'>
+                              <span className='px-2 py-1 bg-[hsl(var(--primary))]/20 text-primary text-xs rounded-full'>
+                                {item.brand}
                               </span>
+                              <div className='flex items-center space-x-1'>
+                                <Tag className='w-3 h-3 text-muted-foreground' />
+                                <span className='text-xs text-muted-foreground'>
+                                  {item.type}
+                                </span>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
 
-                      <p className='text-sm text-muted-foreground mb-3'>
-                        {item.description}
-                      </p>
+                        <p className='text-sm text-muted-foreground mb-3'>
+                          {item.description}
+                        </p>
 
-                      {item.features && item.features.length > 0 && (
-                        <div>
-                          <h4 className='font-medium text-sm mb-2'>
-                            Features:
-                          </h4>
-                          <ul className='text-xs text-muted-foreground space-y-1'>
-                            {item.features
-                              .slice(0, 3)
-                              .map((feature, featureIndex) => (
-                                <li
-                                  key={featureIndex}
-                                  className='flex items-start space-x-2'
-                                >
-                                  <span className='w-1 h-1 bg-primary rounded-full mt-1.5 flex-shrink-0'></span>
-                                  <span>{feature}</span>
+                        {item.features && (item.features?.length || 0) > 0 && (
+                          <div>
+                            <h4 className='font-medium text-sm mb-2'>
+                              Features:
+                            </h4>
+                            <ul className='text-xs text-muted-foreground space-y-1'>
+                              {item.features
+                                ?.slice(0, 3)
+                                ?.map((feature, featureIndex) => (
+                                  <li
+                                    key={featureIndex}
+                                    className='flex items-start space-x-2'
+                                  >
+                                    <span className='w-1 h-1 bg-[hsl(var(--primary))] rounded-full mt-1.5 flex-shrink-0'></span>
+                                    <span>{feature}</span>
+                                  </li>
+                                ))}
+                              {(item.features?.length || 0) > 3 && (
+                                <li className='text-xs italic'>
+                                  +{(item.features?.length || 0) - 3} more
                                 </li>
-                              ))}
-                            {item.features.length > 3 && (
-                              <li className='text-xs italic'>
-                                +{item.features.length - 3} more
-                              </li>
-                            )}
-                          </ul>
-                        </div>
-                      )}
+                              )}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -521,10 +580,23 @@ export default function EquipmentAdmin() {
                             </label>
                             <ClientGuard>
                               <ImageUpload
-                                value={item.image}
-                                onChange={(url) =>
-                                  updateItem(itemIndex, 'image', url || '')
-                                }
+                                value={selectedFiles[itemIndex] || item.image}
+                                onChange={(fileOrUrl) => {
+                                  if (fileOrUrl instanceof File) {
+                                    const newSelectedFiles = [...selectedFiles]
+                                    newSelectedFiles[itemIndex] = fileOrUrl
+                                    setSelectedFiles(newSelectedFiles)
+                                  } else {
+                                    updateItem(
+                                      itemIndex,
+                                      'image',
+                                      fileOrUrl || '',
+                                    )
+                                    const newSelectedFiles = [...selectedFiles]
+                                    newSelectedFiles[itemIndex] = null
+                                    setSelectedFiles(newSelectedFiles)
+                                  }
+                                }}
                                 disabled={isSubmitting}
                                 placeholder='Upload equipment image'
                               />
@@ -599,7 +671,7 @@ export default function EquipmentAdmin() {
                     <button
                       type='submit'
                       disabled={isSubmitting}
-                      className='bg-primary text-primary-foreground px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50'
+                      className='bg-[hsl(var(--primary))] text-primary-foreground px-6 py-2 rounded-lg hover:bg-[hsl(var(--primary))]/90 transition-colors disabled:opacity-50'
                     >
                       {isSubmitting
                         ? editingCategory

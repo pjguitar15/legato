@@ -3,24 +3,66 @@
 import { Phone, MessageCircle, Mail, MapPin, Clock, Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import companyData from '@/data/company.json'
+import { useCompanyData } from '@/hooks/use-company-data'
+import { Skeleton } from '@/components/ui/skeleton'
 
 export default function ContactSection() {
-  const handleMessenger = () => {
-    window.open(companyData.contact.messenger, '_blank')
-  }
+  const { companyData, isLoading } = useCompanyData()
 
-  const handleFacebookMessenger = () => {
-    window.open(`https://m.me/${companyData.contact.facebookPageId}`, '_blank')
+  const handleMessenger = () => {
+    if (companyData?.socialMedia?.messenger) {
+      window.open(companyData.socialMedia.messenger, '_blank')
+    }
   }
 
   const handleCall = () => {
-    window.open(`tel:${companyData.contact.phone}`, '_self')
+    if (companyData?.contact?.phone) {
+      window.open(`tel:${companyData.contact.phone}`, '_self')
+    }
   }
 
   const handleEmail = () => {
-    window.open(`mailto:${companyData.contact.email}`, '_self')
+    if (companyData?.contact?.email) {
+      window.open(`mailto:${companyData.contact.email}`, '_self')
+    }
   }
+
+  if (isLoading) {
+    return (
+      <section id='contact' className='py-20 bg-muted/50'>
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+          <div className='text-center mb-16'>
+            <Skeleton className='h-12 w-96 mx-auto mb-6' />
+            <Skeleton className='h-6 w-2/3 mx-auto' />
+          </div>
+          <div className='grid grid-cols-1 lg:grid-cols-2 gap-12'>
+            <div className='space-y-6'>
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Card key={i} className='border-border'>
+                  <CardContent className='p-6'>
+                    <div className='flex items-center space-x-4'>
+                      <Skeleton className='h-12 w-12 rounded-full' />
+                      <div className='space-y-2 flex-1'>
+                        <Skeleton className='h-5 w-20' />
+                        <Skeleton className='h-4 w-32' />
+                        <Skeleton className='h-3 w-40' />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            <div className='space-y-6'>
+              <Skeleton className='h-48 w-full rounded-xl' />
+              <Skeleton className='h-24 w-full rounded-xl' />
+            </div>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  if (!companyData) return null
 
   return (
     <section id='contact' className='py-20 bg-muted/50'>
@@ -119,7 +161,7 @@ export default function ContactSection() {
                 {/* Facebook Messenger */}
                 <Card
                   className='border-border hover:border-primary/50 transition-colors cursor-pointer'
-                  onClick={handleFacebookMessenger}
+                  onClick={handleMessenger}
                 >
                   <CardContent className='p-6'>
                     <div className='flex items-center space-x-4'>
@@ -128,11 +170,9 @@ export default function ContactSection() {
                       </div>
                       <div>
                         <h4 className='font-semibold'>Facebook Messenger</h4>
-                        <p className='text-muted-foreground'>
-                          @{companyData.contact.facebookPageId}
-                        </p>
+                        <p className='text-muted-foreground'>Chat with us</p>
                         <p className='text-sm text-muted-foreground'>
-                          Chat with us on Facebook
+                          Instant messaging support
                         </p>
                       </div>
                     </div>
@@ -182,11 +222,12 @@ export default function ContactSection() {
                     <div>
                       <h4 className='font-semibold text-primary'>Home Base</h4>
                       <p className='text-muted-foreground'>
-                        {companyData.address.street}
+                        {companyData.contact.address}
                       </p>
                       <p className='text-muted-foreground'>
-                        {companyData.address.city},{' '}
-                        {companyData.address.zipCode}
+                        {companyData.contact.city},{' '}
+                        {companyData.contact.province}{' '}
+                        {companyData.contact.zipCode}
                       </p>
                     </div>
                     <div>
@@ -194,11 +235,9 @@ export default function ContactSection() {
                         Coverage Areas
                       </h4>
                       <ul className='text-muted-foreground space-y-1'>
-                        <li>✓ Trece Martires, Cavite</li>
-                        <li>✓ Metro Manila</li>
-                        <li>✓ Cavite Province</li>
-                        <li>✓ Nearby Laguna areas</li>
-                        <li>✓ Batangas (selected areas)</li>
+                        {companyData.serviceAreas?.map((area, index) => (
+                          <li key={index}>✓ {area}</li>
+                        ))}
                       </ul>
                     </div>
                   </div>
@@ -237,7 +276,7 @@ export default function ContactSection() {
             <div className='space-y-4'>
               <Button
                 onClick={handleMessenger}
-                className='w-full bg-primary text-primary-foreground hover:bg-primary/90 text-lg py-6'
+                className='w-full bg-[hsl(var(--primary))] text-primary-foreground hover:bg-[hsl(var(--primary))]/90 text-lg py-6'
               >
                 <MessageCircle className='w-5 h-5 mr-2' />
                 Get Instant Quote via Messenger

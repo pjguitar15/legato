@@ -1,8 +1,17 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Calendar, MapPin, Users, Clock, Zap } from 'lucide-react'
+import {
+  Calendar,
+  MapPin,
+  Users,
+  Clock,
+  Zap,
+  ChevronDown,
+  ChevronUp,
+} from 'lucide-react'
 import Image from 'next/image'
+import { SkeletonCard, SkeletonText } from '@/components/ui/skeleton'
 
 interface Event {
   _id: string
@@ -19,6 +28,9 @@ interface Event {
 export default function EventsSection() {
   const [events, setEvents] = useState<Event[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [expandedHighlights, setExpandedHighlights] = useState<Set<string>>(
+    new Set(),
+  )
 
   useEffect(() => {
     fetchEvents()
@@ -40,6 +52,18 @@ export default function EventsSection() {
     }
   }
 
+  const toggleHighlights = (eventId: string) => {
+    setExpandedHighlights((prev) => {
+      const newSet = new Set(prev)
+      if (newSet.has(eventId)) {
+        newSet.delete(eventId)
+      } else {
+        newSet.add(eventId)
+      }
+      return newSet
+    })
+  }
+
   if (isLoading) {
     return (
       <section id='events' className='py-20 bg-background'>
@@ -56,23 +80,8 @@ export default function EventsSection() {
 
           {/* Loading Skeleton */}
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
-            {Array.from({ length: 3 }).map((_, index) => (
-              <div
-                key={index}
-                className='bg-card rounded-xl overflow-hidden border animate-pulse'
-              >
-                <div className='h-48 bg-muted'></div>
-                <div className='p-6'>
-                  <div className='h-6 bg-muted rounded w-3/4 mb-3'></div>
-                  <div className='h-4 bg-muted rounded w-full mb-2'></div>
-                  <div className='h-4 bg-muted rounded w-2/3 mb-4'></div>
-                  <div className='flex space-x-2 mb-4'>
-                    <div className='h-6 bg-muted rounded w-16'></div>
-                    <div className='h-6 bg-muted rounded w-20'></div>
-                  </div>
-                  <div className='h-4 bg-muted rounded w-1/2'></div>
-                </div>
-              </div>
+            {Array.from({ length: 6 }).map((_, index) => (
+              <SkeletonCard key={index} />
             ))}
           </div>
         </div>
@@ -139,7 +148,7 @@ export default function EventsSection() {
                     className='object-cover hover:scale-105 transition-transform duration-300'
                   />
                   <div className='absolute top-3 left-3'>
-                    <span className='bg-primary text-primary-foreground px-2 py-1 rounded-full text-xs font-medium'>
+                    <span className='bg-[hsl(var(--primary))] text-primary-foreground px-2 py-1 rounded-full text-xs font-medium'>
                       {event.eventType}
                     </span>
                   </div>
@@ -181,13 +190,35 @@ export default function EventsSection() {
                     <ul className='text-xs text-muted-foreground space-y-1'>
                       {event.highlights.slice(0, 3).map((highlight, index) => (
                         <li key={index} className='flex items-start'>
-                          <span className='w-1 h-1 bg-primary rounded-full mt-1.5 mr-2 flex-shrink-0'></span>
+                          <span className='w-1 h-1 bg-[hsl(var(--primary))] rounded-full mt-1.5 mr-2 flex-shrink-0'></span>
                           <span>{highlight}</span>
                         </li>
                       ))}
+                      {expandedHighlights.has(event._id) &&
+                        event.highlights.slice(3).map((highlight, index) => (
+                          <li key={index + 3} className='flex items-start'>
+                            <span className='w-1 h-1 bg-[hsl(var(--primary))] rounded-full mt-1.5 mr-2 flex-shrink-0'></span>
+                            <span>{highlight}</span>
+                          </li>
+                        ))}
                       {event.highlights.length > 3 && (
-                        <li className='text-xs italic'>
-                          +{event.highlights.length - 3} more highlights
+                        <li>
+                          <button
+                            onClick={() => toggleHighlights(event._id)}
+                            className='text-xs text-primary hover:text-primary/80 transition-colors flex items-center'
+                          >
+                            {expandedHighlights.has(event._id) ? (
+                              <>
+                                <ChevronUp className='w-3 h-3 mr-1' />
+                                Show less
+                              </>
+                            ) : (
+                              <>
+                                <ChevronDown className='w-3 h-3 mr-1' />+
+                                {event.highlights.length - 3} more highlights
+                              </>
+                            )}
+                          </button>
                         </li>
                       )}
                     </ul>
@@ -199,10 +230,6 @@ export default function EventsSection() {
                   <span className='text-xs text-muted-foreground'>
                     {event.eventType}
                   </span>
-                  <div className='flex items-center text-xs text-primary'>
-                    <Clock className='w-3 h-3 mr-1' />
-                    <span>View Details</span>
-                  </div>
                 </div>
               </div>
             </div>

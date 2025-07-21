@@ -37,7 +37,31 @@ export async function PUT(
     const { id } = await params
     const body = await request.json()
 
-    const testimonial = await Testimonial.findByIdAndUpdate(id, body, {
+    // Clean the body data to handle image field properly
+    const cleanedBody = { ...body }
+
+    // Handle image field - convert empty object to empty string
+    if (
+      cleanedBody.image &&
+      typeof cleanedBody.image === 'object' &&
+      Object.keys(cleanedBody.image).length === 0
+    ) {
+      cleanedBody.image = ''
+    }
+
+    // Remove any undefined or null values that might cause issues
+    Object.keys(cleanedBody).forEach((key) => {
+      if (cleanedBody[key] === undefined || cleanedBody[key] === null) {
+        delete cleanedBody[key]
+      }
+    })
+
+    console.log(
+      '📝 Updating testimonial with cleaned data:',
+      JSON.stringify(cleanedBody, null, 2),
+    )
+
+    const testimonial = await Testimonial.findByIdAndUpdate(id, cleanedBody, {
       new: true,
       runValidators: true,
     })
@@ -49,9 +73,10 @@ export async function PUT(
       )
     }
 
+    console.log('✅ Testimonial updated successfully:', testimonial._id)
     return NextResponse.json({ success: true, data: testimonial })
   } catch (error) {
-    console.error('Error updating testimonial:', error)
+    console.error('❌ Error updating testimonial:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to update testimonial' },
       { status: 500 },

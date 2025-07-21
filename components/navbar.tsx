@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { Menu, X, Volume2, Zap } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/theme-toggle'
-import companyData from '@/data/company.json'
+import { useCompanyData } from '@/hooks/use-company-data'
 import Image from 'next/image'
 import whiteLogo from '@/public/Legato Landscape.png'
 import blackLogo from '@/public/Legato Landscape Black.png'
@@ -15,6 +15,7 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false)
   const { theme } = useTheme()
   const [mounted, setMounted] = useState(false)
+  const { companyData, isLoading } = useCompanyData()
 
   useEffect(() => {
     setMounted(true)
@@ -55,7 +56,9 @@ export default function Navbar() {
   }
 
   const handleMessenger = () => {
-    window.open(companyData.contact.messenger, '_blank')
+    if (companyData?.socialMedia?.messenger) {
+      window.open(companyData.socialMedia.messenger, '_blank')
+    }
   }
 
   if (!mounted) {
@@ -77,7 +80,7 @@ export default function Navbar() {
             <div className='w-32 h-auto flex items-center justify-center'>
               <Image
                 src={theme === 'light' ? blackLogo : whiteLogo}
-                alt='Legato Sounds and Lights'
+                alt={companyData?.name || 'Legato Sounds and Lights'}
                 className='absolute w-32 h-auto transition-opacity duration-300'
                 priority
               />
@@ -105,7 +108,7 @@ export default function Navbar() {
             <ThemeToggle />
             <Button
               onClick={handleMessenger}
-              className='hidden sm:flex bg-primary text-primary-foreground hover:bg-primary/90'
+              className='hidden sm:flex bg-[hsl(var(--primary))] text-primary-foreground hover:bg-[hsl(var(--primary))]/90'
               size='sm'
             >
               Book Now
@@ -145,7 +148,7 @@ export default function Navbar() {
             ))}
             <Button
               onClick={handleMessenger}
-              className='w-full mt-4 bg-primary text-primary-foreground hover:bg-primary/90'
+              className='w-full mt-4 bg-[hsl(var(--primary))] text-primary-foreground hover:bg-[hsl(var(--primary))]/90'
             >
               Book Now via Messenger
             </Button>

@@ -21,7 +21,31 @@ export async function POST(request: NextRequest) {
     await connectToDatabase()
     const body = await request.json()
 
-    const testimonial = new Testimonial(body)
+    // Clean the body data to handle image field properly
+    const cleanedBody = { ...body }
+
+    // Handle image field - convert empty object to empty string
+    if (
+      cleanedBody.image &&
+      typeof cleanedBody.image === 'object' &&
+      Object.keys(cleanedBody.image).length === 0
+    ) {
+      cleanedBody.image = ''
+    }
+
+    // Remove any undefined or null values that might cause issues
+    Object.keys(cleanedBody).forEach((key) => {
+      if (cleanedBody[key] === undefined || cleanedBody[key] === null) {
+        delete cleanedBody[key]
+      }
+    })
+
+    console.log(
+      '📝 Creating testimonial with cleaned data:',
+      JSON.stringify(cleanedBody, null, 2),
+    )
+
+    const testimonial = new Testimonial(cleanedBody)
     await testimonial.save()
 
     return NextResponse.json(

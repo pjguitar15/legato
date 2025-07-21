@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { Edit, Save, Users } from 'lucide-react'
 import AuthGuard from '@/components/admin/auth-guard'
+import ImageUpload, { uploadToCloudinary } from '@/components/ui/image-upload'
 
 interface AboutData {
   _id?: string
@@ -20,8 +21,10 @@ interface AboutData {
   team: {
     name: string
     role: string
-    description: string
+    experience: string
+    specialization: string
     image?: string
+    bio: string
   }[]
 }
 
@@ -30,6 +33,9 @@ export default function AboutAdmin() {
   const [isLoading, setIsLoading] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [uploadingImages, setUploadingImages] = useState<{
+    [key: number]: boolean
+  }>({})
   const [formData, setFormData] = useState<AboutData>({
     title: '',
     description: '',
@@ -46,8 +52,10 @@ export default function AboutAdmin() {
       {
         name: '',
         role: '',
-        description: '',
+        experience: '',
+        specialization: '',
         image: '',
+        bio: '',
       },
     ],
   })
@@ -58,18 +66,37 @@ export default function AboutAdmin() {
 
   const fetchAbout = async () => {
     try {
+      console.log('📡 About Admin: Fetching data from /api/admin/about')
       setIsLoading(true)
       const response = await fetch('/api/admin/about')
+      console.log('📨 About Admin: Response status:', response.status)
+
       const data = await response.json()
+      console.log('📋 About Admin: Response data:', data)
 
       if (data.success && data.data) {
+        console.log('✅ About Admin: Setting about data:', data.data)
         setAboutData(data.data)
-        setFormData(data.data)
+        setFormData({
+          ...data.data,
+          values: data.data.values || [],
+          experience: data.data.experience || {
+            years: 0,
+            events: 0,
+            clients: 0,
+          },
+          team: data.data.team || [],
+        })
+        console.log('📝 About Admin: Form data set successfully')
+      } else {
+        console.warn('⚠️ About Admin: No data found or unsuccessful response')
+        console.log('📊 About Admin: Full response:', data)
       }
     } catch (error) {
-      console.error('Error fetching about data:', error)
+      console.error('❌ About Admin: Error fetching about data:', error)
     } finally {
       setIsLoading(false)
+      console.log('✋ About Admin: Fetch completed')
     }
   }
 
@@ -130,7 +157,14 @@ export default function AboutAdmin() {
       ...formData,
       team: [
         ...formData.team,
-        { name: '', role: '', description: '', image: '' },
+        {
+          name: '',
+          role: '',
+          experience: '',
+          specialization: '',
+          image: '',
+          bio: '',
+        },
       ],
     })
   }
@@ -150,6 +184,35 @@ export default function AboutAdmin() {
     const newTeam = [...formData.team]
     newTeam[index] = { ...newTeam[index], [field]: value }
     setFormData({ ...formData, team: newTeam })
+  }
+
+  const handleTeamMemberImageUpload = async (
+    index: number,
+    file: File | string | null,
+  ) => {
+    if (!file) {
+      // Remove image
+      updateTeamMember(index, 'image', '')
+      return
+    }
+
+    if (typeof file === 'string') {
+      // Already a URL, just update
+      updateTeamMember(index, 'image', file)
+      return
+    }
+
+    // Upload new file to Cloudinary
+    try {
+      setUploadingImages((prev) => ({ ...prev, [index]: true }))
+      const imageUrl = await uploadToCloudinary(file)
+      updateTeamMember(index, 'image', imageUrl)
+    } catch (error) {
+      console.error('Error uploading team member image:', error)
+      // You might want to show a toast notification here
+    } finally {
+      setUploadingImages((prev) => ({ ...prev, [index]: false }))
+    }
   }
 
   if (isLoading) {
@@ -188,7 +251,7 @@ export default function AboutAdmin() {
           {!isEditing ? (
             <button
               onClick={() => setIsEditing(true)}
-              className='bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors flex items-center space-x-2'
+              className='bg-[hsl(var(--primary))] text-primary-foreground px-4 py-2 rounded-lg hover:bg-[hsl(var(--primary))]/90 transition-colors flex items-center space-x-2'
             >
               <Edit className='w-4 h-4' />
               <span>Edit About</span>
@@ -207,7 +270,7 @@ export default function AboutAdmin() {
               <button
                 onClick={handleSubmit}
                 disabled={isSubmitting}
-                className='bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors flex items-center space-x-2 disabled:opacity-50'
+                className='bg-[hsl(var(--primary))] text-primary-foreground px-4 py-2 rounded-lg hover:bg-[hsl(var(--primary))]/90 transition-colors flex items-center space-x-2 disabled:opacity-50'
               >
                 <Save className='w-4 h-4' />
                 <span>{isSubmitting ? 'Saving...' : 'Save Changes'}</span>
@@ -231,7 +294,7 @@ export default function AboutAdmin() {
               </p>
               <button
                 onClick={() => setIsEditing(true)}
-                className='px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors'
+                className='px-4 py-2 bg-[hsl(var(--primary))] text-primary-foreground rounded-lg hover:bg-[hsl(var(--primary))]/90 transition-colors'
               >
                 Add About Information
               </button>
@@ -382,7 +445,7 @@ export default function AboutAdmin() {
                       />
                     ) : (
                       <p className='text-2xl font-bold text-primary'>
-                        {aboutData?.experience.years}+
+                        {aboutData?.experience?.years || 0}+
                       </p>
                     )}
                   </div>
@@ -410,7 +473,7 @@ export default function AboutAdmin() {
                       />
                     ) : (
                       <p className='text-2xl font-bold text-primary'>
-                        {aboutData?.experience.events}+
+                        {aboutData?.experience?.events || 0}+
                       </p>
                     )}
                   </div>
@@ -438,7 +501,7 @@ export default function AboutAdmin() {
                       />
                     ) : (
                       <p className='text-2xl font-bold text-primary'>
-                        {aboutData?.experience.clients}+
+                        {aboutData?.experience?.clients || 0}+
                       </p>
                     )}
                   </div>
@@ -486,14 +549,209 @@ export default function AboutAdmin() {
                   </div>
                 ) : (
                   <div className='flex flex-wrap gap-2'>
-                    {aboutData?.values.map((value, index) => (
+                    {aboutData?.values?.map((value, index) => (
                       <span
                         key={index}
-                        className='px-3 py-1 bg-primary/20 text-primary rounded-full text-sm'
+                        className='px-3 py-1 bg-[hsl(var(--primary))]/20 text-primary rounded-full text-sm'
                       >
                         {value}
                       </span>
+                    )) || (
+                      <span className='text-muted-foreground text-sm'>
+                        No values set
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Team Section */}
+              <div>
+                <div className='flex items-center justify-between mb-4'>
+                  <label className='block text-lg font-semibold'>
+                    Team Members
+                  </label>
+                  {isEditing && (
+                    <button
+                      type='button'
+                      onClick={addTeamMember}
+                      className='bg-[hsl(var(--primary))] text-primary-foreground px-3 py-2 rounded-lg hover:bg-[hsl(var(--primary))]/90 transition-colors text-sm flex items-center space-x-2'
+                    >
+                      <Users className='w-4 h-4' />
+                      <span>Add Member</span>
+                    </button>
+                  )}
+                </div>
+
+                {isEditing ? (
+                  <div className='space-y-6'>
+                    {formData.team?.map((member, index) => (
+                      <div
+                        key={index}
+                        className='border border-border rounded-lg p-4 bg-background/50'
+                      >
+                        <div className='flex items-center justify-between mb-4'>
+                          <h4 className='font-semibold text-lg'>
+                            Team Member {index + 1}
+                          </h4>
+                          {formData.team.length > 1 && (
+                            <button
+                              type='button'
+                              onClick={() => removeTeamMember(index)}
+                              className='text-red-500 hover:bg-red-500/10 px-3 py-1 rounded-lg transition-colors text-sm'
+                            >
+                              Remove
+                            </button>
+                          )}
+                        </div>
+
+                        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                          <div>
+                            <label className='block text-sm font-medium mb-1'>
+                              Name *
+                            </label>
+                            <input
+                              type='text'
+                              value={member.name}
+                              onChange={(e) =>
+                                updateTeamMember(index, 'name', e.target.value)
+                              }
+                              className='w-full px-3 py-2 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent'
+                              placeholder='e.g., John Doe'
+                            />
+                          </div>
+
+                          <div>
+                            <label className='block text-sm font-medium mb-1'>
+                              Role *
+                            </label>
+                            <input
+                              type='text'
+                              value={member.role}
+                              onChange={(e) =>
+                                updateTeamMember(index, 'role', e.target.value)
+                              }
+                              className='w-full px-3 py-2 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent'
+                              placeholder='e.g., Lead Sound Engineer'
+                            />
+                          </div>
+
+                          <div>
+                            <label className='block text-sm font-medium mb-1'>
+                              Experience *
+                            </label>
+                            <input
+                              type='text'
+                              value={member.experience}
+                              onChange={(e) =>
+                                updateTeamMember(
+                                  index,
+                                  'experience',
+                                  e.target.value,
+                                )
+                              }
+                              className='w-full px-3 py-2 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent'
+                              placeholder='e.g., 5+ years'
+                            />
+                          </div>
+
+                          <div>
+                            <label className='block text-sm font-medium mb-1'>
+                              Specialization *
+                            </label>
+                            <input
+                              type='text'
+                              value={member.specialization}
+                              onChange={(e) =>
+                                updateTeamMember(
+                                  index,
+                                  'specialization',
+                                  e.target.value,
+                                )
+                              }
+                              className='w-full px-3 py-2 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent'
+                              placeholder='e.g., Live Sound Engineering, Drummer'
+                            />
+                          </div>
+
+                          <div className='md:col-span-2'>
+                            <label className='block text-sm font-medium mb-1'>
+                              Profile Image
+                            </label>
+                            <ImageUpload
+                              value={member.image || ''}
+                              onChange={(file) =>
+                                handleTeamMemberImageUpload(index, file)
+                              }
+                              disabled={uploadingImages[index] || isSubmitting}
+                              placeholder='Upload team member photo'
+                              className='w-full'
+                            />
+                            {uploadingImages[index] && (
+                              <p className='text-xs text-muted-foreground mt-1'>
+                                Uploading image...
+                              </p>
+                            )}
+                          </div>
+
+                          <div className='md:col-span-2'>
+                            <label className='block text-sm font-medium mb-1'>
+                              Bio *
+                            </label>
+                            <textarea
+                              value={member.bio}
+                              onChange={(e) =>
+                                updateTeamMember(index, 'bio', e.target.value)
+                              }
+                              rows={3}
+                              className='w-full px-3 py-2 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-none'
+                              placeholder='Brief description of the team member...'
+                            />
+                          </div>
+                        </div>
+                      </div>
                     ))}
+                  </div>
+                ) : (
+                  <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+                    {aboutData?.team?.map((member, index) => (
+                      <div
+                        key={index}
+                        className='bg-background/50 border border-border rounded-lg p-4'
+                      >
+                        <div className='flex items-center space-x-3 mb-3'>
+                          <div className='w-12 h-12 bg-[hsl(var(--primary))]/20 rounded-full flex items-center justify-center'>
+                            {member.image ? (
+                              <img
+                                src={member.image}
+                                alt={member.name}
+                                className='w-12 h-12 rounded-full object-cover'
+                              />
+                            ) : (
+                              <Users className='w-6 h-6 text-primary' />
+                            )}
+                          </div>
+                          <div>
+                            <h4 className='font-semibold'>{member.name}</h4>
+                            <p className='text-sm text-muted-foreground'>
+                              {member.role}
+                            </p>
+                          </div>
+                        </div>
+                        <div className='space-y-2 text-sm'>
+                          <p className='text-primary font-medium'>
+                            {member.experience} • {member.specialization}
+                          </p>
+                          <p className='text-muted-foreground line-clamp-3'>
+                            {member.bio}
+                          </p>
+                        </div>
+                      </div>
+                    )) || (
+                      <div className='col-span-full text-center py-8 text-muted-foreground'>
+                        No team members added yet
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

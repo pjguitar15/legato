@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { ChevronDown, ChevronUp, HelpCircle } from 'lucide-react'
+import { SkeletonFAQ, SkeletonText } from '@/components/ui/skeleton'
 
 interface FAQ {
   _id: string
@@ -55,18 +56,14 @@ export default function FAQSection() {
           </div>
 
           {/* Loading Skeleton */}
-          <div className='space-y-4'>
-            {Array.from({ length: 5 }).map((_, index) => (
-              <div
-                key={index}
-                className='bg-card rounded-xl p-6 border animate-pulse'
-              >
-                <div className='h-5 bg-muted rounded w-3/4 mb-3'></div>
-                <div className='h-4 bg-muted rounded w-full mb-2'></div>
-                <div className='h-4 bg-muted rounded w-2/3'></div>
-              </div>
-            ))}
+          <div className='text-center mb-16'>
+            <h2 className='text-4xl sm:text-5xl font-display font-bold mb-6'>
+              Frequently Asked <span className='text-gradient'>Questions</span>
+            </h2>
+            <SkeletonText lines={2} className='max-w-3xl mx-auto' />
           </div>
+
+          <SkeletonFAQ />
         </div>
       </section>
     )
@@ -161,7 +158,7 @@ export default function FAQSection() {
             questions about our services.
           </p>
           <div className='flex flex-col sm:flex-row gap-4 justify-center'>
-            <button className='bg-primary text-primary-foreground px-8 py-3 rounded-lg hover:bg-primary/90 transition-colors font-semibold'>
+            <button className='bg-[hsl(var(--primary))] text-primary-foreground px-8 py-3 rounded-lg hover:bg-[hsl(var(--primary))]/90 transition-colors font-semibold'>
               Contact Us Today
             </button>
             <button className='bg-secondary text-secondary-foreground hover:bg-secondary/80 px-8 py-3 rounded-lg transition-colors font-semibold'>

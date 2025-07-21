@@ -9,6 +9,8 @@ interface CompanyData {
   name: string
   tagline: string
   description: string
+  coverage: string
+  footerDescription: string
   logo: string
   contact: {
     address: string
@@ -20,9 +22,10 @@ interface CompanyData {
   }
   socialMedia: {
     facebook?: string
+    messenger?: string
     instagram?: string
     youtube?: string
-    tiktok?: string
+    facebookPageId?: string
   }
   businessHours: {
     weekdays: string
@@ -42,6 +45,8 @@ export default function CompanyAdmin() {
     name: '',
     tagline: '',
     description: '',
+    coverage: '',
+    footerDescription: '',
     logo: '',
     contact: {
       address: '',
@@ -53,9 +58,10 @@ export default function CompanyAdmin() {
     },
     socialMedia: {
       facebook: '',
+      messenger: '',
       instagram: '',
       youtube: '',
-      tiktok: '',
+      facebookPageId: '',
     },
     businessHours: {
       weekdays: '',
@@ -78,7 +84,24 @@ export default function CompanyAdmin() {
 
       if (data.success && data.data) {
         setCompanyData(data.data)
-        setFormData(data.data)
+        setFormData({
+          ...data.data,
+          serviceAreas: data.data.serviceAreas || [],
+          businessHours: data.data.businessHours || {
+            weekdays: '',
+            weekends: '',
+            holidays: '',
+          },
+          contact: data.data.contact || {
+            address: '',
+            city: '',
+            province: '',
+            zipCode: '',
+            phone: '',
+            email: '',
+          },
+          socialMedia: data.data.socialMedia || {},
+        })
       }
     } catch (error) {
       console.error('Error fetching company data:', error)
@@ -175,7 +198,7 @@ export default function CompanyAdmin() {
           {!isEditing ? (
             <button
               onClick={() => setIsEditing(true)}
-              className='bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors flex items-center space-x-2'
+              className='bg-[hsl(var(--primary))] text-primary-foreground px-4 py-2 rounded-lg hover:bg-[hsl(var(--primary))]/90 transition-colors flex items-center space-x-2'
             >
               <Edit className='w-4 h-4' />
               <span>Edit Info</span>
@@ -194,7 +217,7 @@ export default function CompanyAdmin() {
               <button
                 onClick={handleSubmit}
                 disabled={isSubmitting}
-                className='bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors flex items-center space-x-2 disabled:opacity-50'
+                className='bg-[hsl(var(--primary))] text-primary-foreground px-4 py-2 rounded-lg hover:bg-[hsl(var(--primary))]/90 transition-colors flex items-center space-x-2 disabled:opacity-50'
               >
                 <Save className='w-4 h-4' />
                 <span>{isSubmitting ? 'Saving...' : 'Save Changes'}</span>
@@ -219,7 +242,7 @@ export default function CompanyAdmin() {
               </p>
               <button
                 onClick={() => setIsEditing(true)}
-                className='px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors'
+                className='px-4 py-2 bg-[hsl(var(--primary))] text-primary-foreground rounded-lg hover:bg-[hsl(var(--primary))]/90 transition-colors'
               >
                 Add Company Information
               </button>
@@ -298,6 +321,56 @@ export default function CompanyAdmin() {
                   ) : (
                     <p className='text-muted-foreground'>
                       {companyData?.description}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className='block text-sm font-medium mb-2'>
+                    Coverage Text
+                  </label>
+                  {isEditing ? (
+                    <input
+                      type='text'
+                      value={formData.coverage}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          coverage: e.target.value,
+                        })
+                      }
+                      className='w-full px-3 py-2 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent'
+                      placeholder='e.g., Serving Rock Bands & Live Music Events - Cavite, Metro Manila, and Nearby Areas'
+                      required
+                    />
+                  ) : (
+                    <p className='text-muted-foreground'>
+                      {companyData?.coverage}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className='block text-sm font-medium mb-2'>
+                    Footer Description
+                  </label>
+                  {isEditing ? (
+                    <textarea
+                      value={formData.footerDescription}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          footerDescription: e.target.value,
+                        })
+                      }
+                      className='w-full px-3 py-2 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent'
+                      rows={3}
+                      placeholder='Description that appears in the footer below the logo...'
+                      required
+                    />
+                  ) : (
+                    <p className='text-muted-foreground'>
+                      {companyData?.footerDescription}
                     </p>
                   )}
                 </div>
@@ -528,6 +601,150 @@ export default function CompanyAdmin() {
                 </div>
               </div>
 
+              {/* Social Media */}
+              <div className='space-y-6'>
+                <h3 className='text-lg font-semibold border-b border-border pb-2 flex items-center space-x-2'>
+                  <span>Social Media</span>
+                </h3>
+
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+                  <div>
+                    <label className='block text-sm font-medium mb-2'>
+                      Facebook Page URL
+                    </label>
+                    {isEditing ? (
+                      <input
+                        type='url'
+                        value={formData.socialMedia.facebook || ''}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            socialMedia: {
+                              ...formData.socialMedia,
+                              facebook: e.target.value,
+                            },
+                          })
+                        }
+                        className='w-full px-3 py-2 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent'
+                        placeholder='https://www.facebook.com/legatosoundsandlightsrental'
+                      />
+                    ) : (
+                      <p className='text-muted-foreground'>
+                        {companyData?.socialMedia?.facebook || 'Not set'}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className='block text-sm font-medium mb-2'>
+                      Facebook Page ID
+                    </label>
+                    {isEditing ? (
+                      <input
+                        type='text'
+                        value={formData.socialMedia.facebookPageId || ''}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            socialMedia: {
+                              ...formData.socialMedia,
+                              facebookPageId: e.target.value,
+                            },
+                          })
+                        }
+                        className='w-full px-3 py-2 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent'
+                        placeholder='legatosoundsandlightsrental'
+                      />
+                    ) : (
+                      <p className='text-muted-foreground'>
+                        {companyData?.socialMedia?.facebookPageId || 'Not set'}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className='block text-sm font-medium mb-2'>
+                      Messenger Link
+                    </label>
+                    {isEditing ? (
+                      <input
+                        type='url'
+                        value={formData.socialMedia.messenger || ''}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            socialMedia: {
+                              ...formData.socialMedia,
+                              messenger: e.target.value,
+                            },
+                          })
+                        }
+                        className='w-full px-3 py-2 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent'
+                        placeholder='https://m.me/legatosoundsandlightsrental'
+                      />
+                    ) : (
+                      <p className='text-muted-foreground'>
+                        {companyData?.socialMedia?.messenger || 'Not set'}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className='block text-sm font-medium mb-2'>
+                      YouTube Channel
+                    </label>
+                    {isEditing ? (
+                      <input
+                        type='url'
+                        value={formData.socialMedia.youtube || ''}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            socialMedia: {
+                              ...formData.socialMedia,
+                              youtube: e.target.value,
+                            },
+                          })
+                        }
+                        className='w-full px-3 py-2 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent'
+                        placeholder='https://www.youtube.com/@LegatoSoundsandLights'
+                      />
+                    ) : (
+                      <p className='text-muted-foreground'>
+                        {companyData?.socialMedia?.youtube || 'Not set'}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className='block text-sm font-medium mb-2'>
+                      Instagram
+                    </label>
+                    {isEditing ? (
+                      <input
+                        type='url'
+                        value={formData.socialMedia.instagram || ''}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            socialMedia: {
+                              ...formData.socialMedia,
+                              instagram: e.target.value,
+                            },
+                          })
+                        }
+                        className='w-full px-3 py-2 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent'
+                        placeholder='https://instagram.com/legatosounds'
+                      />
+                    ) : (
+                      <p className='text-muted-foreground'>
+                        {companyData?.socialMedia?.instagram || 'Not set'}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
               {/* Business Hours */}
               <div className='space-y-6'>
                 <h3 className='text-lg font-semibold border-b border-border pb-2 flex items-center space-x-2'>
@@ -558,7 +775,7 @@ export default function CompanyAdmin() {
                       />
                     ) : (
                       <p className='text-muted-foreground'>
-                        {companyData?.businessHours.weekdays}
+                        {companyData?.businessHours?.weekdays || 'Not set'}
                       </p>
                     )}
                   </div>
@@ -585,7 +802,7 @@ export default function CompanyAdmin() {
                       />
                     ) : (
                       <p className='text-muted-foreground'>
-                        {companyData?.businessHours.weekends}
+                        {companyData?.businessHours?.weekends || 'Not set'}
                       </p>
                     )}
                   </div>
@@ -612,7 +829,7 @@ export default function CompanyAdmin() {
                       />
                     ) : (
                       <p className='text-muted-foreground'>
-                        {companyData?.businessHours.holidays}
+                        {companyData?.businessHours?.holidays || 'Not set'}
                       </p>
                     )}
                   </div>
@@ -662,14 +879,18 @@ export default function CompanyAdmin() {
                   </div>
                 ) : (
                   <div className='flex flex-wrap gap-2'>
-                    {companyData?.serviceAreas.map((area, index) => (
+                    {companyData?.serviceAreas?.map((area, index) => (
                       <span
                         key={index}
-                        className='px-3 py-1 bg-primary/20 text-primary rounded-full text-sm'
+                        className='px-3 py-1 bg-[hsl(var(--primary))]/20 text-primary rounded-full text-sm'
                       >
                         {area}
                       </span>
-                    ))}
+                    )) || (
+                      <span className='text-muted-foreground text-sm'>
+                        No service areas set
+                      </span>
+                    )}
                   </div>
                 )}
               </div>
