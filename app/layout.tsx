@@ -5,7 +5,6 @@ import './globals.css'
 import { ThemeProvider } from '@/components/theme-provider'
 import Navbar from '@/components/navbar'
 import Footer from '@/components/footer'
-import MessengerChatWidget from '@/components/messenger-chat-widget'
 
 const poppins = Poppins({
   subsets: ['latin'],

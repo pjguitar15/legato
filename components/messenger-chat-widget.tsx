@@ -9,6 +9,16 @@ interface MessengerChatWidgetProps {
   themeColor?: string
 }
 
+// Extend Window interface for TypeScript
+declare global {
+  interface Window {
+    fbAsyncInit?: () => void
+    FB?: {
+      init: (config: { xfbml: boolean; version: string }) => void
+    }
+  }
+}
+
 export default function MessengerChatWidget({
   pageId = process.env.NEXT_PUBLIC_FACEBOOK_PAGE_ID,
   minimized = true,
@@ -18,7 +28,7 @@ export default function MessengerChatWidget({
     // Load Facebook SDK
     if (typeof window !== 'undefined' && pageId) {
       // Set up Facebook SDK
-      window.fbAsyncInit = function () {
+      window.fbAsyncInit = () => {
         window.FB?.init({
           xfbml: true,
           version: 'v18.0',
@@ -26,11 +36,10 @@ export default function MessengerChatWidget({
       }
 
       // Load the SDK asynchronously
-      ;(function (d, s, id) {
-        var js,
-          fjs = d.getElementsByTagName(s)[0]
+      ;((d, s, id) => {
+        const fjs = d.getElementsByTagName(s)[0]
         if (d.getElementById(id)) return
-        js = d.createElement(s) as HTMLScriptElement
+        const js = d.createElement(s) as HTMLScriptElement
         js.id = id
         js.src = 'https://connect.facebook.net/en_US/sdk/xfbml.customerchat.js'
         fjs.parentNode?.insertBefore(js, fjs)
@@ -53,10 +62,10 @@ export default function MessengerChatWidget({
 
       <div
         className='fb-customerchat'
-        attribution='setup_tool'
-        page_id={pageId}
-        theme_color={themeColor}
-        minimized={minimized.toString()}
+        data-attribution='setup_tool'
+        data-page-id={pageId}
+        data-theme-color={themeColor}
+        data-minimized={minimized.toString()}
       />
 
       {/* Custom Chat Button (optional - shows before FB loads) */}
@@ -95,12 +104,4 @@ export default function MessengerChatWidget({
       />
     </>
   )
-}
-
-// Extend Window interface for TypeScript
-declare global {
-  interface Window {
-    fbAsyncInit: () => void
-    FB: any
-  }
 }

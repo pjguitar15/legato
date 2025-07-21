@@ -5,6 +5,21 @@ const VERIFY_TOKEN = process.env.FACEBOOK_VERIFY_TOKEN
 const PAGE_ACCESS_TOKEN = process.env.FACEBOOK_PAGE_ACCESS_TOKEN
 const APP_SECRET = process.env.FACEBOOK_APP_SECRET
 
+interface MessagingEvent {
+  sender: { id: string }
+  message?: { text?: string }
+}
+
+interface WebhookEntry {
+  id: string
+  messaging: MessagingEvent[]
+}
+
+interface WebhookData {
+  object: string
+  entry: WebhookEntry[]
+}
+
 // Verify webhook endpoint (GET request from Facebook)
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
@@ -33,7 +48,7 @@ export async function POST(request: NextRequest) {
       return new NextResponse('Invalid signature', { status: 401 })
     }
 
-    const data = JSON.parse(body)
+    const data: WebhookData = JSON.parse(body)
 
     if (data.object === 'page') {
       // Process each entry
@@ -68,7 +83,7 @@ function verifySignature(body: string, signature: string | null): boolean {
 }
 
 // Handle incoming messages and send automated responses
-async function handleMessage(messaging: any) {
+async function handleMessage(messaging: MessagingEvent) {
   const senderId = messaging.sender.id
   const message = messaging.message
 
@@ -158,7 +173,7 @@ We specialize in rock bands and live music events. Travel charges may apply for 
 📧 Email: info@legatosounds.com
 📍 Trece Martires City, Cavite
 
-💬 Facebook: You're already here!
+💬 Facebook: You&apos;re already here!
 🌐 Website: [Your website URL]
 
 Best way to reach us: WhatsApp for instant quotes! 🎵`
@@ -169,7 +184,7 @@ Best way to reach us: WhatsApp for instant quotes! 🎵`
   ) {
     response = `🤘 Hey there! Welcome to Legato Sounds and Lights! 
 
-We're your go-to team for ROCK-SOLID sound and lighting for:
+We&apos;re your go-to team for ROCK-SOLID sound and lighting for:
 🎸 Rock concerts
 🎵 Live band performances  
 🎤 Music events
@@ -181,7 +196,7 @@ How can we help make your event LEGENDARY? Just ask about:
 • Pricing
 • Coverage areas
 
-"Turn It Up to 11!" 🎵🔥`
+&quot;Turn It Up to 11!&quot; 🎵🔥`
   } else {
     response = `🎵 Thanks for contacting Legato Sounds and Lights! 
 

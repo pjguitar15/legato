@@ -35,16 +35,6 @@ export default function EquipmentSection() {
     },
   }
 
-  const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 50, scale: 0.9 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      transition: { duration: 0.6, ease: 'easeOut' },
-    },
-  }
-
   const cardVariants: Variants = {
     hidden: { opacity: 0, y: 30 },
     visible: {
@@ -95,8 +85,10 @@ export default function EquipmentSection() {
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.6, delay: 0.6 }}
         >
-          <div className='flex space-x-4 bg-bg-[hsl(var(--secondary)/0.5)]
- rounded-xl p-2'>
+          <div
+            className='flex space-x-4 bg-bg-[hsl(var(--secondary)/0.5)]
+ rounded-xl p-2'
+          >
             {equipmentData.categories.map((category, index) => (
               <motion.button
                 key={index}

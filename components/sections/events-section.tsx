@@ -1,155 +1,294 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { Calendar, MapPin, ChevronLeft, ChevronRight, Tag } from "lucide-react"
-import eventsData from "@/data/events.json"
+import { useState } from 'react'
+import {
+  Calendar,
+  MapPin,
+  Users,
+  Clock,
+  Star,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react'
+import eventsData from '@/data/events.json'
+import Image from 'next/image'
 
 export default function EventsSection() {
-  const [currentEvent, setCurrentEvent] = useState(0)
+  const [activeEvent, setActiveEvent] = useState(0)
 
   const nextEvent = () => {
-    setCurrentEvent((prev) => (prev + 1) % eventsData.events.length)
+    setActiveEvent((prev) => (prev + 1) % eventsData.events.length)
   }
 
   const prevEvent = () => {
-    setCurrentEvent((prev) => (prev - 1 + eventsData.events.length) % eventsData.events.length)
+    setActiveEvent(
+      (prev) =>
+        (prev - 1 + eventsData.events.length) % eventsData.events.length,
+    )
   }
 
-  const currentEventData = eventsData.events[currentEvent]
-
   return (
-    <section id="events" className="py-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id='events' className='py-20'>
+      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         {/* Section Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-4xl sm:text-5xl font-display font-bold mb-6">
-            Event <span className="text-gradient">Highlights</span>
+        <div className='text-center mb-16'>
+          <h2 className='text-4xl sm:text-5xl font-display font-bold mb-6'>
+            Recent <span className='text-gradient'>Events</span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Discover some of our most memorable events and see how we bring visions to life with professional sound and
-            lighting.
+          <p className='text-xl text-muted-foreground max-w-3xl mx-auto'>
+            Relive the energy of our recent rock concerts and live events. Every
+            show is a testament to our commitment to excellence.
           </p>
         </div>
 
         {/* Featured Event */}
-        <div className="relative bg-card rounded-3xl overflow-hidden border border-border shadow-2xl">
-          <div className="grid grid-cols-1 lg:grid-cols-2">
-            {/* Event Image */}
-            <div className="relative aspect-video lg:aspect-auto">
-              <img
-                src={currentEventData.image || "/placeholder.svg"}
-                alt={currentEventData.title}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute top-6 left-6">
-                <span className="bg-[hsl(var(--primary))] text-primary-foreground px-4 py-2 rounded-full text-sm font-semibold">
-                  {currentEventData.eventType}
-                </span>
+        <div className='relative mb-16'>
+          <div className='bg-card rounded-3xl overflow-hidden border border-border shadow-xl'>
+            <div className='grid grid-cols-1 lg:grid-cols-2'>
+              {/* Event Image */}
+              <div className='relative aspect-square lg:aspect-auto'>
+                <Image
+                  src={
+                    eventsData.events[activeEvent].image || '/placeholder.svg'
+                  }
+                  alt={eventsData.events[activeEvent].title}
+                  fill
+                  className='object-cover'
+                />
+                <div className='absolute inset-0 bg-black/20' />
+
+                {/* Event Type Badge */}
+                <div className='absolute top-6 left-6'>
+                  <span className='bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm font-bold'>
+                    {eventsData.events[activeEvent].eventType}
+                  </span>
+                </div>
+
+                {/* Rating */}
+                <div className='absolute top-6 right-6 bg-black/50 backdrop-blur-sm rounded-full px-3 py-2'>
+                  <div className='flex items-center space-x-1'>
+                    <Star className='w-4 h-4 text-yellow-500 fill-current' />
+                    <span className='text-white text-sm font-semibold'>
+                      5.0
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Event Details */}
+              <div className='p-8 lg:p-12'>
+                <h3 className='text-3xl font-bold mb-4'>
+                  {eventsData.events[activeEvent].title}
+                </h3>
+                <p className='text-muted-foreground mb-6 leading-relaxed'>
+                  {eventsData.events[activeEvent].description}
+                </p>
+
+                {/* Event Info Grid */}
+                <div className='grid grid-cols-2 gap-6 mb-8'>
+                  <div className='flex items-center space-x-3'>
+                    <Calendar className='w-5 h-5 text-primary' />
+                    <div>
+                      <div className='text-sm text-muted-foreground'>Date</div>
+                      <div className='font-semibold'>
+                        {eventsData.events[activeEvent].date}
+                      </div>
+                    </div>
+                  </div>
+                  <div className='flex items-center space-x-3'>
+                    <MapPin className='w-5 h-5 text-primary' />
+                    <div>
+                      <div className='text-sm text-muted-foreground'>
+                        Location
+                      </div>
+                      <div className='font-semibold'>
+                        {eventsData.events[activeEvent].location}
+                      </div>
+                    </div>
+                  </div>
+                  <div className='flex items-center space-x-3'>
+                    <Users className='w-5 h-5 text-primary' />
+                    <div>
+                      <div className='text-sm text-muted-foreground'>
+                        Package
+                      </div>
+                      <div className='font-semibold'>
+                        {eventsData.events[activeEvent].package}
+                      </div>
+                    </div>
+                  </div>
+                  <div className='flex items-center space-x-3'>
+                    <Clock className='w-5 h-5 text-primary' />
+                    <div>
+                      <div className='text-sm text-muted-foreground'>Type</div>
+                      <div className='font-semibold'>
+                        {eventsData.events[activeEvent].eventType}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Event Highlights */}
+                <div className='mb-8'>
+                  <h4 className='font-semibold mb-3'>Event Highlights:</h4>
+                  <div className='grid grid-cols-1 gap-2'>
+                    {eventsData.events[activeEvent].highlights.map(
+                      (item, index) => (
+                        <div
+                          key={index}
+                          className='flex items-center space-x-2'
+                        >
+                          <div className='w-2 h-2 bg-primary rounded-full' />
+                          <span className='text-sm'>{item}</span>
+                        </div>
+                      ),
+                    )}
+                  </div>
+                </div>
+
+                {/* Client Testimonial Placeholder */}
+                <div className='bg-secondary/50 rounded-xl p-4 mb-6'>
+                  <div className='flex items-center space-x-3 mb-3'>
+                    <Image
+                      src='/placeholder-user.jpg'
+                      alt='Event Client'
+                      width={40}
+                      height={40}
+                      className='rounded-full object-cover'
+                    />
+                    <div>
+                      <div className='font-semibold text-sm'>
+                        Event Organizer
+                      </div>
+                      <div className='text-xs text-muted-foreground'>
+                        Satisfied Client
+                      </div>
+                    </div>
+                  </div>
+                  <blockquote className='text-sm italic'>
+                    &quot;Legato delivered an amazing experience for our event.
+                    Professional service and outstanding quality!&quot;
+                  </blockquote>
+                </div>
+
+                {/* CTA Button */}
+                <button className='w-full bg-primary text-primary-foreground py-3 rounded-xl hover:bg-primary/90 transition-colors font-semibold'>
+                  Book Similar Event
+                </button>
               </div>
             </div>
-
-            {/* Event Details */}
-            <div className="p-8 lg:p-12 flex flex-col justify-center">
-              <h3 className="text-3xl font-display font-bold mb-4">{currentEventData.title}</h3>
-
-              <p className="text-muted-foreground mb-6 text-lg">{currentEventData.description}</p>
-
-              {/* Event Meta */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-                <div className="flex items-center space-x-3">
-                  <Calendar className="w-5 h-5 text-primary" />
-                  <span>{new Date(currentEventData.date).toLocaleDateString()}</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <MapPin className="w-5 h-5 text-primary" />
-                  <span>{currentEventData.location}</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Tag className="w-5 h-5 text-primary" />
-                  <span>{currentEventData.package}</span>
-                </div>
-              </div>
-
-              {/* Highlights */}
-              <div>
-                <h4 className="font-semibold mb-4">Event Highlights:</h4>
-                <ul className="space-y-3">
-                  {currentEventData.highlights.map((highlight, index) => (
-                    <li key={index} className="flex items-center space-x-3">
-                      <div className="w-2 h-2 bg-[hsl(var(--primary))] rounded-full flex-shrink-0" />
-                      <span className="text-sm">{highlight}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
           </div>
 
-          {/* Navigation */}
-          <div className="absolute top-1/2 left-4 transform -translate-y-1/2">
-            <button
-              onClick={prevEvent}
-              className="bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-colors backdrop-blur-sm"
-            >
-              <ChevronLeft className="w-6 h-6" />
-            </button>
-          </div>
-          <div className="absolute top-1/2 right-4 transform -translate-y-1/2">
-            <button
-              onClick={nextEvent}
-              className="bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-colors backdrop-blur-sm"
-            >
-              <ChevronRight className="w-6 h-6" />
-            </button>
-          </div>
+          {/* Navigation Arrows */}
+          <button
+            onClick={prevEvent}
+            className='absolute left-4 top-1/2 transform -translate-y-1/2 bg-primary text-primary-foreground p-3 rounded-full shadow-lg hover:bg-primary/90 transition-colors z-10'
+          >
+            <ChevronLeft className='w-6 h-6' />
+          </button>
+
+          <button
+            onClick={nextEvent}
+            className='absolute right-4 top-1/2 transform -translate-y-1/2 bg-primary text-primary-foreground p-3 rounded-full shadow-lg hover:bg-primary/90 transition-colors z-10'
+          >
+            <ChevronRight className='w-6 h-6' />
+          </button>
         </div>
 
         {/* Event Indicators */}
-        <div className="flex justify-center mt-8 space-x-2">
+        <div className='flex justify-center space-x-2 mb-16'>
           {eventsData.events.map((_, index) => (
             <button
               key={index}
-              onClick={() => setCurrentEvent(index)}
+              onClick={() => setActiveEvent(index)}
               className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                index === currentEvent ? "bg-[hsl(var(--primary))]" : "bg-muted-foreground/30"
+                index === activeEvent ? 'bg-primary' : 'bg-muted-foreground/30'
               }`}
             />
           ))}
         </div>
 
         {/* All Events Grid */}
-        <div className="mt-16">
-          <h3 className="text-2xl font-display font-bold text-center mb-8">Recent Events</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {eventsData.events.map((event, index) => (
-              <div
-                key={event.id}
-                className={`bg-card rounded-2xl overflow-hidden border transition-all duration-300 hover:shadow-xl hover:scale-105 cursor-pointer glow-hover ${
-                  index === currentEvent ? "border-primary" : "border-border hover:border-primary/50"
-                }`}
-                onClick={() => setCurrentEvent(index)}
-              >
-                <div className="aspect-video relative">
-                  <img
-                    src={event.image || "/placeholder.svg"}
-                    alt={event.title}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute top-4 left-4">
-                    <span className="bg-[hsl(var(--primary))] text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
-                      {event.eventType}
-                    </span>
-                  </div>
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
+          {eventsData.events.map((event, index) => (
+            <div
+              key={event.id}
+              className={`bg-card rounded-2xl overflow-hidden border transition-all duration-300 hover:shadow-xl cursor-pointer ${
+                index === activeEvent
+                  ? 'border-primary glow'
+                  : 'border-border hover:border-primary/50'
+              }`}
+              onClick={() => setActiveEvent(index)}
+            >
+              {/* Event Image */}
+              <div className='aspect-video relative'>
+                <Image
+                  src={event.image || '/placeholder.svg'}
+                  alt={event.title}
+                  fill
+                  className='object-cover'
+                />
+                <div className='absolute inset-0 bg-black/20' />
+
+                {/* Event Type */}
+                <div className='absolute top-4 left-4'>
+                  <span className='bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold'>
+                    {event.eventType}
+                  </span>
                 </div>
-                <div className="p-6">
-                  <h4 className="font-bold mb-2 line-clamp-2">{event.title}</h4>
-                  <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                    <Calendar className="w-4 h-4" />
-                    <span>{new Date(event.date).toLocaleDateString()}</span>
+
+                {/* Rating */}
+                <div className='absolute top-4 right-4 bg-black/50 backdrop-blur-sm rounded-full px-2 py-1'>
+                  <div className='flex items-center space-x-1'>
+                    <Star className='w-3 h-3 text-yellow-500 fill-current' />
+                    <span className='text-white text-xs'>5.0</span>
                   </div>
                 </div>
               </div>
-            ))}
+
+              {/* Event Info */}
+              <div className='p-6'>
+                <h3 className='text-lg font-bold mb-2'>{event.title}</h3>
+                <p className='text-muted-foreground text-sm mb-4 line-clamp-2'>
+                  {event.description}
+                </p>
+
+                {/* Quick Info */}
+                <div className='space-y-2 text-sm'>
+                  <div className='flex items-center space-x-2'>
+                    <Calendar className='w-4 h-4 text-primary' />
+                    <span>{event.date}</span>
+                  </div>
+                  <div className='flex items-center space-x-2'>
+                    <MapPin className='w-4 h-4 text-primary' />
+                    <span>{event.location}</span>
+                  </div>
+                  <div className='flex items-center space-x-2'>
+                    <Users className='w-4 h-4 text-primary' />
+                    <span>{event.package}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Bottom CTA */}
+        <div className='mt-16 text-center bg-secondary/30 rounded-3xl p-8'>
+          <h3 className='text-2xl font-bold mb-4'>
+            Ready to Rock Your Next Event?
+          </h3>
+          <p className='text-muted-foreground mb-6'>
+            Let us bring the same energy and professionalism to your event.
+            Every show is unique, every performance is legendary.
+          </p>
+          <div className='flex flex-col sm:flex-row gap-4 justify-center'>
+            <button className='bg-primary text-primary-foreground px-8 py-3 rounded-xl hover:bg-primary/90 transition-colors'>
+              Plan Your Event
+            </button>
+            <button className='bg-blue-600 text-white px-8 py-3 rounded-xl hover:bg-blue-700 transition-colors'>
+              View Full Portfolio
+            </button>
           </div>
         </div>
       </div>

@@ -1,9 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { MessageCircle, Phone, Star, Music, Zap, Volume2 } from 'lucide-react'
+import { MessageCircle, Phone, Music, Zap, Volume2 } from 'lucide-react'
 import companyData from '@/data/company.json'
-import logo from '@/public/Legato Portrait White.png'
 import Image from 'next/image'
 import heroBg1 from '@/public/hero-bg.jpg'
 import heroBg2 from '@/public/hero-bg-2.jpg'
@@ -286,7 +285,9 @@ export default function HeroSection() {
             key={index}
             onClick={() => setCurrentSlide(index)}
             className={`w-3 h-3 rounded-full transition-all duration-300 ${
-              index === currentSlide ? 'bg-[hsl(var(--primary))]' : 'bg-white/30'
+              index === currentSlide
+                ? 'bg-[hsl(var(--primary))]'
+                : 'bg-white/30'
             }`}
             whileHover={{ scale: 1.2 }}
             whileTap={{ scale: 0.9 }}
