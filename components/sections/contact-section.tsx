@@ -6,11 +6,8 @@ import { Card, CardContent } from '@/components/ui/card'
 import companyData from '@/data/company.json'
 
 export default function ContactSection() {
-  const handleWhatsApp = () => {
-    window.open(
-      `https://wa.me/${companyData.contact.whatsapp.replace(/[^0-9]/g, '')}`,
-      '_blank',
-    )
+  const handleMessenger = () => {
+    window.open(companyData.contact.messenger, '_blank')
   }
 
   const handleFacebookMessenger = () => {
@@ -48,24 +45,24 @@ export default function ContactSection() {
                 Get in Touch
               </h3>
               <div className='space-y-4'>
-                {/* WhatsApp */}
+                {/* Messenger */}
                 <Card
                   className='border-primary/20 hover:border-primary/50 transition-colors cursor-pointer'
-                  onClick={handleWhatsApp}
+                  onClick={handleMessenger}
                 >
                   <CardContent className='p-6'>
                     <div className='flex items-center space-x-4'>
-                      <div className='bg-green-500 p-3 rounded-full'>
+                      <div className='bg-blue-500 p-3 rounded-full'>
                         <MessageCircle className='w-6 h-6 text-white' />
                       </div>
                       <div>
                         <h4 className='font-semibold'>
-                          WhatsApp (Recommended)
+                          Facebook Messenger (Recommended)
                         </h4>
                         <p className='text-muted-foreground'>
-                          {companyData.contact.whatsapp}
+                          m.me/legatosounds
                         </p>
-                        <p className='text-sm text-green-600'>
+                        <p className='text-sm text-blue-600'>
                           Instant quotes & fast response!
                         </p>
                       </div>
@@ -239,11 +236,11 @@ export default function ContactSection() {
             {/* CTA Buttons */}
             <div className='space-y-4'>
               <Button
-                onClick={handleWhatsApp}
+                onClick={handleMessenger}
                 className='w-full bg-primary text-primary-foreground hover:bg-primary/90 text-lg py-6'
               >
                 <MessageCircle className='w-5 h-5 mr-2' />
-                Get Instant Quote via WhatsApp
+                Get Instant Quote via Messenger
               </Button>
               <Button
                 onClick={handleCall}

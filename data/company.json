@@ -19,12 +19,13 @@
     }
   ],
   "contact": {
-    "phone": "09762737247 ",
-    "whatsapp": "+63 917 123 4567",
+    "phone": "09762737247",
+    "mobile": "09762737247",
     "email": "info@legatosounds.com",
     "facebook": "https://facebook.com/legatosounds",
     "facebookPageId": "legatosounds",
-    "instagram": "https://instagram.com/legatosounds"
+    "messenger": "https://m.me/legatosounds",
+    "address": "123 Rock Street, Trece Martires City, Cavite 4109"
   },
   "address": {
     "street": "123 Rock Street, Trece Martires City",

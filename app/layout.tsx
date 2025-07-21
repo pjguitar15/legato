@@ -3,8 +3,6 @@ import type { Metadata } from 'next'
 import { Poppins, Montserrat } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/components/theme-provider'
-import Navbar from '@/components/navbar'
-import Footer from '@/components/footer'
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -65,20 +63,20 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang='en' className={`${poppins.variable} ${montserrat.variable}`}>
-      <body className='transition-colors duration-300'>
+    <html
+      lang='en'
+      className={`${poppins.variable} ${montserrat.variable}`}
+      suppressHydrationWarning
+    >
+      <body className='transition-colors duration-300' suppressHydrationWarning>
         <ThemeProvider
           attribute='class'
-          defaultTheme='light'
-          enableSystem
-          disableTransitionOnChange
+          defaultTheme='system'
+          enableSystem={true}
+          disableTransitionOnChange={false}
+          storageKey='legato-theme'
         >
-          <Navbar />
-          <main>{children}</main>
-          <Footer />
-
-          {/* Facebook Messenger Chat Widget */}
-          {/* <MessengerChatWidget /> */}
+          {children}
         </ThemeProvider>
       </body>
     </html>

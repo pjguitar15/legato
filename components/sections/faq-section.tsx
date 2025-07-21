@@ -1,118 +1,171 @@
 'use client'
 
-import { useState } from 'react'
-import { ChevronDown, ChevronUp } from 'lucide-react'
-import faqData from '@/data/faq.json'
+import { useState, useEffect } from 'react'
+import { ChevronDown, ChevronUp, HelpCircle } from 'lucide-react'
 
-interface PricingItem {
-  package: string
-  price: string
-}
-
-interface FAQItem {
-  id: number
+interface FAQ {
+  _id: string
   question: string
   answer: string
-  pricing?: PricingItem[]
-  note?: string
+  order: number
 }
 
 export default function FAQSection() {
-  const [openItems, setOpenItems] = useState<number[]>([])
+  const [faqs, setFaqs] = useState<FAQ[]>([])
+  const [openIndex, setOpenIndex] = useState<number | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
-  const toggleItem = (index: number) => {
-    setOpenItems((prev) =>
-      prev.includes(index)
-        ? prev.filter((item) => item !== index)
-        : [...prev, index],
+  useEffect(() => {
+    fetchFaqs()
+  }, [])
+
+  const fetchFaqs = async () => {
+    try {
+      setIsLoading(true)
+      const response = await fetch('/api/admin/faq')
+      const data = await response.json()
+
+      if (data.success) {
+        // Sort by order field
+        const sortedFaqs = data.data.sort((a: FAQ, b: FAQ) => a.order - b.order)
+        setFaqs(sortedFaqs)
+      }
+    } catch (error) {
+      console.error('Error fetching FAQs:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const toggleFAQ = (index: number) => {
+    setOpenIndex(openIndex === index ? null : index)
+  }
+
+  if (isLoading) {
+    return (
+      <section id='faq' className='py-20 bg-muted/50'>
+        <div className='max-w-4xl mx-auto px-4 sm:px-6 lg:px-8'>
+          <div className='text-center mb-16'>
+            <h2 className='text-4xl sm:text-5xl font-display font-bold mb-6'>
+              Frequently Asked <span className='text-gradient'>Questions</span>
+            </h2>
+            <p className='text-xl text-muted-foreground max-w-3xl mx-auto'>
+              Everything you need to know about our sound and lighting services.
+            </p>
+          </div>
+
+          {/* Loading Skeleton */}
+          <div className='space-y-4'>
+            {Array.from({ length: 5 }).map((_, index) => (
+              <div
+                key={index}
+                className='bg-card rounded-xl p-6 border animate-pulse'
+              >
+                <div className='h-5 bg-muted rounded w-3/4 mb-3'></div>
+                <div className='h-4 bg-muted rounded w-full mb-2'></div>
+                <div className='h-4 bg-muted rounded w-2/3'></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  if (faqs.length === 0) {
+    return (
+      <section id='faq' className='py-20 bg-muted/50'>
+        <div className='max-w-4xl mx-auto px-4 sm:px-6 lg:px-8'>
+          <div className='text-center mb-16'>
+            <h2 className='text-4xl sm:text-5xl font-display font-bold mb-6'>
+              Frequently Asked <span className='text-gradient'>Questions</span>
+            </h2>
+            <p className='text-xl text-muted-foreground max-w-3xl mx-auto'>
+              We're building our FAQ section. If you have questions, please
+              contact us directly!
+            </p>
+          </div>
+
+          <div className='text-center py-12'>
+            <div className='w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4'>
+              <HelpCircle className='w-8 h-8 text-muted-foreground' />
+            </div>
+            <h3 className='text-lg font-semibold mb-2'>FAQs Coming Soon</h3>
+            <p className='text-muted-foreground'>
+              We're compiling the most common questions for you.
+            </p>
+          </div>
+        </div>
+      </section>
     )
   }
 
   return (
-    <section id='faq' className='py-20'>
+    <section id='faq' className='py-20 bg-muted/50'>
       <div className='max-w-4xl mx-auto px-4 sm:px-6 lg:px-8'>
         {/* Section Header */}
         <div className='text-center mb-16'>
           <h2 className='text-4xl sm:text-5xl font-display font-bold mb-6'>
             Frequently Asked <span className='text-gradient'>Questions</span>
           </h2>
-          <p className='text-xl text-muted-foreground'>
-            Everything you need to know about our rock-solid sound and lighting
-            services.
+          <p className='text-xl text-muted-foreground max-w-3xl mx-auto'>
+            Everything you need to know about our sound and lighting services.
+            Can't find what you're looking for? Contact us!
           </p>
         </div>
 
-        {/* FAQ Items */}
+        {/* FAQ Accordion */}
         <div className='space-y-4'>
-          {faqData.faqs.map((faq, index) => {
-            const faqItem = faq as FAQItem
-            return (
-              <div
-                key={index}
-                className='bg-card rounded-2xl border border-border overflow-hidden'
+          {faqs.map((faq, index) => (
+            <div
+              key={faq._id}
+              className='bg-card rounded-xl border border-border overflow-hidden hover:shadow-md transition-all duration-300'
+            >
+              <button
+                onClick={() => toggleFAQ(index)}
+                className='w-full flex items-center justify-between p-6 text-left hover:bg-accent/50 transition-colors'
               >
-                <button
-                  onClick={() => toggleItem(index)}
-                  className='w-full px-8 py-6 text-left flex items-center justify-between hover:bg-accent transition-colors'
-                >
-                  <h3 className='text-lg font-semibold pr-4'>
-                    {faqItem.question}
-                  </h3>
-                  {openItems.includes(index) ? (
-                    <ChevronUp className='w-5 h-5 text-primary flex-shrink-0' />
+                <h3 className='text-lg font-semibold pr-4'>{faq.question}</h3>
+                <div className='flex-shrink-0'>
+                  {openIndex === index ? (
+                    <ChevronUp className='w-5 h-5 text-primary' />
                   ) : (
-                    <ChevronDown className='w-5 h-5 text-primary flex-shrink-0' />
+                    <ChevronDown className='w-5 h-5 text-primary' />
                   )}
-                </button>
-                {openItems.includes(index) && (
-                  <div className='px-8 pb-6'>
-                    <div className='text-muted-foreground'>
-                      {faqItem.answer}
-                    </div>
-                    {faqItem.pricing && (
-                      <div className='mt-4 p-4 bg-secondary/50 rounded-xl'>
-                        <h4 className='font-semibold text-primary mb-2'>
-                          Pricing:
-                        </h4>
-                        <ul className='space-y-1 text-sm'>
-                          {faqItem.pricing.map((price, idx) => (
-                            <li key={idx} className='flex justify-between'>
-                              <span>{price.package}</span>
-                              <span className='font-semibold'>
-                                {price.price}
-                              </span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                    {faqItem.note && (
-                      <div className='mt-4 p-4 bg-primary/10 rounded-xl'>
-                        <p className='text-sm font-medium text-primary'>
-                          💡 Pro Tip: {faqItem.note}
-                        </p>
-                      </div>
-                    )}
+                </div>
+              </button>
+
+              {/* Answer */}
+              <div
+                className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                  openIndex === index
+                    ? 'max-h-96 opacity-100'
+                    : 'max-h-0 opacity-0'
+                }`}
+              >
+                <div className='px-6 pb-6 border-t border-border'>
+                  <div className='pt-4 text-muted-foreground leading-relaxed'>
+                    {faq.answer}
                   </div>
-                )}
+                </div>
               </div>
-            )
-          })}
+            </div>
+          ))}
         </div>
 
         {/* Contact CTA */}
-        <div className='mt-16 text-center bg-secondary/30 rounded-3xl p-8'>
-          <h3 className='text-2xl font-bold mb-4'>Still Have Questions?</h3>
+        <div className='mt-16 text-center bg-card rounded-2xl p-8 border border-border'>
+          <h3 className='text-2xl font-semibold mb-4'>Still Have Questions?</h3>
           <p className='text-muted-foreground mb-6'>
-            Our sound engineers are ready to help you plan the perfect setup for
-            your event.
+            Our team is here to help! Get in touch and we'll answer any
+            questions about our services.
           </p>
           <div className='flex flex-col sm:flex-row gap-4 justify-center'>
-            <button className='bg-primary text-primary-foreground px-6 py-3 rounded-xl hover:bg-primary/90 transition-colors'>
-              WhatsApp Us
+            <button className='bg-primary text-primary-foreground px-8 py-3 rounded-lg hover:bg-primary/90 transition-colors font-semibold'>
+              Contact Us Today
             </button>
-            <button className='bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition-colors'>
-              Facebook Messenger
+            <button className='bg-secondary text-secondary-foreground hover:bg-secondary/80 px-8 py-3 rounded-lg transition-colors font-semibold'>
+              View Our Services
             </button>
           </div>
         </div>

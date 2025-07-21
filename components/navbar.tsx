@@ -36,11 +36,26 @@ export default function Navbar() {
     { href: '#contact', label: 'Contact' },
   ]
 
-  const handleWhatsApp = () => {
-    window.open(
-      `https://wa.me/${companyData.contact.whatsapp.replace(/[^0-9]/g, '')}`,
-      '_blank',
-    )
+  const handleNavClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    href: string,
+  ) => {
+    e.preventDefault()
+    const targetId = href.replace('#', '')
+    const targetElement = document.getElementById(targetId)
+
+    if (targetElement) {
+      const offsetTop = targetElement.offsetTop - 80 // Account for fixed navbar
+      window.scrollTo({
+        top: offsetTop,
+        behavior: 'smooth',
+      })
+    }
+    setIsMenuOpen(false)
+  }
+
+  const handleMessenger = () => {
+    window.open(companyData.contact.messenger, '_blank')
   }
 
   if (!mounted) {
@@ -76,6 +91,7 @@ export default function Navbar() {
                 <a
                   key={item.href}
                   href={item.href}
+                  onClick={(e) => handleNavClick(e, item.href)}
                   className='text-foreground hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200'
                 >
                   {item.label}
@@ -88,7 +104,7 @@ export default function Navbar() {
           <div className='flex items-center space-x-4'>
             <ThemeToggle />
             <Button
-              onClick={handleWhatsApp}
+              onClick={handleMessenger}
               className='hidden sm:flex bg-primary text-primary-foreground hover:bg-primary/90'
               size='sm'
             >
@@ -122,16 +138,16 @@ export default function Navbar() {
                 key={item.href}
                 href={item.href}
                 className='text-foreground hover:text-primary block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200'
-                onClick={() => setIsMenuOpen(false)}
+                onClick={(e) => handleNavClick(e, item.href)}
               >
                 {item.label}
               </a>
             ))}
             <Button
-              onClick={handleWhatsApp}
+              onClick={handleMessenger}
               className='w-full mt-4 bg-primary text-primary-foreground hover:bg-primary/90'
             >
-              Book Now via WhatsApp
+              Book Now via Messenger
             </Button>
           </div>
         </div>

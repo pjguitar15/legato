@@ -1,192 +1,278 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ChevronLeft, ChevronRight, Star, Quote } from 'lucide-react'
-import testimonialsData from '@/data/testimonials.json'
+import { ChevronLeft, ChevronRight, Star, Quote, User } from 'lucide-react'
 import Image from 'next/image'
 
+interface Testimonial {
+  _id: string
+  name: string
+  event: string
+  date: string
+  rating: number
+  feedback: string
+  location: string
+  image?: string
+}
+
 export default function TestimonialsSection() {
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([])
   const [activeTestimonial, setActiveTestimonial] = useState(0)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setActiveTestimonial(
-        (prev) => (prev + 1) % testimonialsData.testimonials.length,
-      )
-    }, 5000)
-    return () => clearInterval(timer)
+    fetchTestimonials()
   }, [])
 
+  useEffect(() => {
+    if (testimonials.length > 0) {
+      const timer = setInterval(() => {
+        setActiveTestimonial((prev) => (prev + 1) % testimonials.length)
+      }, 5000)
+      return () => clearInterval(timer)
+    }
+  }, [testimonials.length])
+
+  const fetchTestimonials = async () => {
+    try {
+      setIsLoading(true)
+      const response = await fetch('/api/admin/testimonials')
+      const data = await response.json()
+
+      if (data.success) {
+        setTestimonials(data.data)
+      }
+    } catch (error) {
+      console.error('Error fetching testimonials:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const nextTestimonial = () => {
-    setActiveTestimonial(
-      (prev) => (prev + 1) % testimonialsData.testimonials.length,
-    )
+    setActiveTestimonial((prev) => (prev + 1) % testimonials.length)
   }
 
   const prevTestimonial = () => {
     setActiveTestimonial(
-      (prev) =>
-        (prev - 1 + testimonialsData.testimonials.length) %
-        testimonialsData.testimonials.length,
+      (prev) => (prev - 1 + testimonials.length) % testimonials.length,
     )
   }
 
+  if (isLoading) {
+    return (
+      <section id='testimonials' className='py-20 bg-background'>
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+          <div className='text-center mb-16'>
+            <h2 className='text-4xl sm:text-5xl font-display font-bold mb-6'>
+              What Our <span className='text-gradient'>Clients Say</span>
+            </h2>
+            <p className='text-xl text-muted-foreground max-w-3xl mx-auto'>
+              Don't just take our word for it. Here's what our clients have to
+              say about their experience with Legato.
+            </p>
+          </div>
+
+          {/* Loading Skeleton */}
+          <div className='max-w-4xl mx-auto'>
+            <div className='bg-card rounded-3xl p-8 border animate-pulse'>
+              <div className='flex items-center justify-center mb-6'>
+                <div className='w-20 h-20 bg-muted rounded-full'></div>
+              </div>
+              <div className='text-center space-y-4'>
+                <div className='h-6 bg-muted rounded w-3/4 mx-auto'></div>
+                <div className='h-4 bg-muted rounded w-full'></div>
+                <div className='h-4 bg-muted rounded w-2/3 mx-auto'></div>
+                <div className='h-4 bg-muted rounded w-1/2 mx-auto'></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  if (testimonials.length === 0) {
+    return (
+      <section id='testimonials' className='py-20 bg-background'>
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+          <div className='text-center mb-16'>
+            <h2 className='text-4xl sm:text-5xl font-display font-bold mb-6'>
+              What Our <span className='text-gradient'>Clients Say</span>
+            </h2>
+            <p className='text-xl text-muted-foreground max-w-3xl mx-auto'>
+              We're building our reputation one event at a time. Check back soon
+              for client testimonials!
+            </p>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  const currentTestimonial = testimonials[activeTestimonial]
+
   return (
-    <section id='testimonials' className='py-20 bg-muted/50'>
-      <div className='max-w-6xl mx-auto px-4 sm:px-6 lg:px-8'>
+    <section id='testimonials' className='py-20 bg-background'>
+      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         {/* Section Header */}
         <div className='text-center mb-16'>
           <h2 className='text-4xl sm:text-5xl font-display font-bold mb-6'>
-            What <span className='text-gradient'>Rockers Say</span>
+            What Our <span className='text-gradient'>Clients Say</span>
           </h2>
           <p className='text-xl text-muted-foreground max-w-3xl mx-auto'>
-            Don&apos;t just take our word for it. Here&apos;s what bands and
-            event organizers say about our sound and lighting services.
+            Don't just take our word for it. Here's what our clients have to say
+            about their experience with Legato.
           </p>
         </div>
 
-        {/* Main Testimonial Display */}
-        <div className='relative'>
-          <div className='bg-card rounded-3xl p-8 md:p-12 border border-border shadow-xl'>
+        {/* Main Testimonial Carousel */}
+        <div className='max-w-4xl mx-auto mb-16'>
+          <div className='relative bg-card rounded-3xl p-8 md:p-12 border shadow-lg'>
             {/* Quote Icon */}
-            <div className='flex justify-center mb-8'>
-              <Quote className='w-12 h-12 text-primary' />
+            <div className='absolute top-6 left-6'>
+              <Quote className='w-8 h-8 text-primary/30' />
+            </div>
+
+            {/* Navigation Buttons */}
+            <div className='absolute top-6 right-6 flex space-x-2'>
+              <button
+                onClick={prevTestimonial}
+                className='p-2 rounded-full bg-background hover:bg-accent transition-colors'
+                disabled={testimonials.length <= 1}
+              >
+                <ChevronLeft className='w-5 h-5' />
+              </button>
+              <button
+                onClick={nextTestimonial}
+                className='p-2 rounded-full bg-background hover:bg-accent transition-colors'
+                disabled={testimonials.length <= 1}
+              >
+                <ChevronRight className='w-5 h-5' />
+              </button>
             </div>
 
             {/* Testimonial Content */}
-            <div className='text-center'>
-              <blockquote className='text-2xl md:text-3xl font-medium text-foreground mb-8 leading-relaxed'>
-                &ldquo;
-                {testimonialsData.testimonials[activeTestimonial].feedback}
-                &rdquo;
+            <div className='text-center pt-8'>
+              {/* Customer Photo */}
+              <div className='flex justify-center mb-6'>
+                {currentTestimonial.image ? (
+                  <Image
+                    src={currentTestimonial.image}
+                    alt={currentTestimonial.name}
+                    width={80}
+                    height={80}
+                    className='w-20 h-20 rounded-full object-cover border-4 border-primary'
+                  />
+                ) : (
+                  <div className='w-20 h-20 rounded-full bg-muted flex items-center justify-center border-4 border-primary'>
+                    <User className='w-8 h-8 text-muted-foreground' />
+                  </div>
+                )}
+              </div>
+
+              {/* Rating */}
+              <div className='flex justify-center mb-6'>
+                {[...Array(currentTestimonial.rating)].map((_, i) => (
+                  <Star
+                    key={i}
+                    className='w-6 h-6 text-yellow-400 fill-current'
+                  />
+                ))}
+              </div>
+
+              {/* Testimonial Text */}
+              <blockquote className='text-xl md:text-2xl font-medium text-foreground mb-6 leading-relaxed'>
+                &ldquo;{currentTestimonial.feedback}&rdquo;
               </blockquote>
 
-              {/* Client Info */}
-              <div className='flex items-center justify-center space-x-6'>
-                <Image
-                  src={
-                    testimonialsData.testimonials[activeTestimonial].image ||
-                    '/placeholder-user.jpg'
-                  }
-                  alt={testimonialsData.testimonials[activeTestimonial].name}
-                  width={80}
-                  height={80}
-                  className='rounded-full object-cover'
-                />
-                <div className='text-left'>
-                  <div className='font-bold text-xl'>
-                    {testimonialsData.testimonials[activeTestimonial].name}
-                  </div>
-                  <div className='text-primary font-semibold'>
-                    {testimonialsData.testimonials[activeTestimonial].event}
-                  </div>
-                  <div className='text-muted-foreground'>
-                    {testimonialsData.testimonials[activeTestimonial].location}
-                  </div>
-
-                  {/* Star Rating */}
-                  <div className='flex space-x-1 mt-2'>
-                    {[
-                      ...Array(
-                        testimonialsData.testimonials[activeTestimonial].rating,
-                      ),
-                    ].map((_, i) => (
-                      <Star
-                        key={i}
-                        className='w-5 h-5 text-yellow-500 fill-current'
-                      />
-                    ))}
-                  </div>
-                </div>
+              {/* Customer Info */}
+              <div className='space-y-1'>
+                <p className='font-semibold text-lg'>
+                  {currentTestimonial.name}
+                </p>
+                <p className='text-primary font-medium'>
+                  {currentTestimonial.event}
+                </p>
+                <p className='text-muted-foreground text-sm'>
+                  {currentTestimonial.location} •{' '}
+                  {new Date(currentTestimonial.date).toLocaleDateString()}
+                </p>
               </div>
             </div>
           </div>
 
-          {/* Navigation Arrows */}
-          <button
-            onClick={prevTestimonial}
-            className='absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 bg-primary text-primary-foreground p-3 rounded-full shadow-lg hover:bg-primary/90 transition-colors z-10'
-          >
-            <ChevronLeft className='w-6 h-6' />
-          </button>
-
-          <button
-            onClick={nextTestimonial}
-            className='absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-4 bg-primary text-primary-foreground p-3 rounded-full shadow-lg hover:bg-primary/90 transition-colors z-10'
-          >
-            <ChevronRight className='w-6 h-6' />
-          </button>
+          {/* Testimonial Indicators */}
+          {testimonials.length > 1 && (
+            <div className='flex justify-center mt-8 space-x-2'>
+              {testimonials.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setActiveTestimonial(index)}
+                  className={`w-3 h-3 rounded-full transition-colors ${
+                    index === activeTestimonial ? 'bg-primary' : 'bg-muted'
+                  }`}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* Testimonial Indicators */}
-        <div className='flex justify-center space-x-2 mt-8'>
-          {testimonialsData.testimonials.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setActiveTestimonial(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-300 ${
+        {/* All Testimonials Grid */}
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+          {testimonials.slice(0, 6).map((testimonial, index) => (
+            <div
+              key={testimonial._id}
+              className={`bg-card rounded-xl p-6 border transition-all duration-300 hover:shadow-md cursor-pointer ${
                 index === activeTestimonial
-                  ? 'bg-primary'
-                  : 'bg-muted-foreground/30'
+                  ? 'border-primary shadow-lg'
+                  : 'border-border'
               }`}
-            />
-          ))}
-        </div>
-
-        {/* Additional Testimonials Grid */}
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-16'>
-          {testimonialsData.testimonials
-            .slice(0, 3)
-            .map((testimonial, index) => (
-              <div
-                key={index}
-                className='bg-card rounded-2xl p-6 border border-border hover:border-primary/50 transition-colors'
-              >
-                <div className='flex items-center space-x-4 mb-4'>
+              onClick={() => setActiveTestimonial(index)}
+            >
+              {/* Mini testimonial header */}
+              <div className='flex items-center space-x-3 mb-4'>
+                {testimonial.image ? (
                   <Image
-                    src={testimonial.image || '/placeholder-user.jpg'}
+                    src={testimonial.image}
                     alt={testimonial.name}
-                    width={50}
-                    height={50}
-                    className='rounded-full object-cover'
+                    width={40}
+                    height={40}
+                    className='w-10 h-10 rounded-full object-cover'
                   />
-                  <div>
-                    <div className='font-semibold'>{testimonial.name}</div>
-                    <div className='text-sm text-primary'>
-                      {testimonial.event}
-                    </div>
-                    <div className='flex space-x-1 mt-1'>
-                      {[...Array(testimonial.rating)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className='w-4 h-4 text-yellow-500 fill-current'
-                        />
-                      ))}
-                    </div>
+                ) : (
+                  <div className='w-10 h-10 rounded-full bg-muted flex items-center justify-center'>
+                    <User className='w-5 h-5 text-muted-foreground' />
                   </div>
+                )}
+                <div>
+                  <p className='font-semibold text-sm'>{testimonial.name}</p>
+                  <p className='text-xs text-primary'>{testimonial.event}</p>
                 </div>
-                <blockquote className='text-muted-foreground text-sm'>
-                  &ldquo;{testimonial.feedback.substring(0, 120)}...&rdquo;
-                </blockquote>
               </div>
-            ))}
-        </div>
 
-        {/* Bottom CTA */}
-        <div className='mt-16 text-center bg-secondary/30 rounded-3xl p-8'>
-          <h3 className='text-2xl font-bold mb-4'>Ready to Rock Your Event?</h3>
-          <p className='text-muted-foreground mb-6'>
-            Join hundreds of satisfied bands and event organizers who trust
-            Legato for their sound and lighting needs.
-          </p>
-          <div className='flex flex-col sm:flex-row gap-4 justify-center'>
-            <button className='bg-primary text-primary-foreground px-8 py-3 rounded-xl hover:bg-primary/90 transition-colors'>
-              Get Your Quote Today
-            </button>
-            <button className='bg-blue-600 text-white px-8 py-3 rounded-xl hover:bg-blue-700 transition-colors'>
-              See Our Portfolio
-            </button>
-          </div>
+              {/* Rating */}
+              <div className='flex mb-3'>
+                {[...Array(testimonial.rating)].map((_, i) => (
+                  <Star
+                    key={i}
+                    className='w-4 h-4 text-yellow-400 fill-current'
+                  />
+                ))}
+              </div>
+
+              {/* Testimonial excerpt */}
+              <p className='text-sm text-muted-foreground line-clamp-3'>
+                &ldquo;{testimonial.feedback}&rdquo;
+              </p>
+
+              {/* Location and date */}
+              <div className='mt-4 text-xs text-muted-foreground'>
+                {testimonial.location} •{' '}
+                {new Date(testimonial.date).toLocaleDateString()}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>

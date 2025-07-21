@@ -33,11 +33,8 @@ export default function HeroSection() {
     return () => clearInterval(timer)
   }, [heroImages.length])
 
-  const handleWhatsApp = () => {
-    window.open(
-      `https://wa.me/${companyData.contact.whatsapp.replace(/[^0-9]/g, '')}`,
-      '_blank',
-    )
+  const handleMessenger = () => {
+    window.open(companyData.contact.messenger, '_blank')
   }
 
   const handleFacebookMessenger = () => {
@@ -210,7 +207,7 @@ export default function HeroSection() {
               variants={buttonVariants}
               whileHover='hover'
               whileTap='tap'
-              onClick={handleWhatsApp}
+              onClick={handleMessenger}
               className='bg-[hsl(var(--primary))] text-primary-foreground px-8 py-4 rounded-xl hover:bg-[hsl(var(--primary))]/90 transition-all duration-300 flex items-center space-x-3 text-lg font-bold glow-hover'
             >
               <MessageCircle className='w-6 h-6' />
