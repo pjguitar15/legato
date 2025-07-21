@@ -1,0 +1,44 @@
+{
+  "testimonials": [
+    {
+      "id": 1,
+      "name": "Maria Santos",
+      "event": "Wedding Reception",
+      "date": "2024-01-15",
+      "rating": 5,
+      "feedback": "LEGATO made our wedding absolutely perfect! The sound quality was crystal clear and the lighting created such a romantic atmosphere. Our guests are still talking about how amazing everything looked and sounded.",
+      "location": "Tagaytay, Cavite",
+      "image": "/placeholder.svg?height=100&width=100"
+    },
+    {
+      "id": 2,
+      "name": "Robert Chen",
+      "event": "Corporate Event",
+      "date": "2024-02-20",
+      "rating": 5,
+      "feedback": "Professional, reliable, and top-notch equipment. The team handled our corporate event flawlessly. The audio was perfect for our presentations and the lighting added the perfect ambiance for our awards ceremony.",
+      "location": "Makati City",
+      "image": "/placeholder.svg?height=100&width=100"
+    },
+    {
+      "id": 3,
+      "name": "Isabella Rodriguez",
+      "event": "18th Birthday Party",
+      "date": "2024-03-10",
+      "rating": 5,
+      "feedback": "My daughter's debut was absolutely magical! The lights were stunning and the sound system was perfect for both the program and the dancing. LEGATO exceeded all our expectations!",
+      "location": "Las Piñas City",
+      "image": "/placeholder.svg?height=100&width=100"
+    },
+    {
+      "id": 4,
+      "name": "Michael Torres",
+      "event": "Live Concert",
+      "date": "2024-03-25",
+      "rating": 5,
+      "feedback": "As a musician, I'm very particular about sound quality. LEGATO's equipment and expertise are top-tier. The sound was crisp, clear, and powerful. Highly recommended for any live music event!",
+      "location": "Imus, Cavite",
+      "image": "/placeholder.svg?height=100&width=100"
+    }
+  ]
+}

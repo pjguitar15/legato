@@ -1,0 +1,73 @@
+{
+  "categories": [
+    {
+      "name": "Audio Equipment",
+      "items": [
+        {
+          "id": 1,
+          "name": "RCF ART 745A",
+          "type": "Active Speaker",
+          "description": "Professional 15\" active speaker with exceptional clarity and power",
+          "image": "/rcf.webp",
+          "features": ["1400W Peak Power", "Class-D Amplifier", "Professional Grade"],
+          "brand": "RCF"
+        },
+        {
+          "id": 2,
+          "name": "Allen & Heath SQ-5",
+          "type": "Digital Mixer",
+          "description": "Professional digital mixing console with advanced features",
+          "image": "/sq5.jpg",
+          "features": ["48 Input Channels", "Touch Screen Control", "Built-in Effects"],
+          "brand": "Allen & Heath"
+        },
+        {
+          "id": 3,
+          "name": "Shure SM58",
+          "type": "Dynamic Microphone",
+          "description": "Industry standard vocal microphone",
+          "image": "/shure.webp",
+          "features": ["Cardioid Pattern", "Shock Mount", "Legendary Reliability"],
+          "brand": "Shure"
+        }
+      ]
+    },
+    {
+      "name": "Lighting Equipment",
+      "items": [
+        {
+          "id": 4,
+          "name": "Moving Head LED",
+          "type": "Intelligent Lighting",
+          "description": "Professional moving head lights with full color spectrum",
+          "image": "/placeholder.svg?height=300&width=400",
+          "features": ["360° Pan/Tilt", "RGB+W LEDs", "DMX Control"],
+          "brand": "Chauvet"
+        },
+        {
+          "id": 5,
+          "name": "LED Par Lights",
+          "type": "Wash Lighting",
+          "description": "Versatile LED par lights for ambient lighting",
+          "image": "/placeholder.svg?height=300&width=400",
+          "features": ["RGBW Color Mixing", "Silent Operation", "Compact Design"],
+          "brand": "ADJ"
+        }
+      ]
+    },
+    {
+      "name": "Instruments",
+      "items": [
+        {
+          "id": 6,
+          "name": "Pearl Export Series",
+          "type": "Drum Set",
+          "description": "Professional 5-piece drum set with cymbals",
+          "image": "/placeholder.svg?height=300&width=400",
+          "features": ["5-Piece Configuration", "Poplar Shells", "Professional Hardware"],
+          "brand": "Pearl"
+        }
+      ]
+    }
+  ]
+}

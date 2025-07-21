@@ -1,0 +1,52 @@
+{
+  "images": [
+    {
+      "id": 1,
+      "url": "/placeholder.svg?height=400&width=600",
+      "caption": "Elegant Wedding Reception",
+      "eventType": "Wedding",
+      "location": "Tagaytay, Cavite",
+      "date": "2024-01-15"
+    },
+    {
+      "id": 2,
+      "url": "/placeholder.svg?height=400&width=600",
+      "caption": "Corporate Annual Gala",
+      "eventType": "Corporate",
+      "location": "Makati City",
+      "date": "2024-02-20"
+    },
+    {
+      "id": 3,
+      "url": "/placeholder.svg?height=400&width=600",
+      "caption": "18th Birthday Celebration",
+      "eventType": "Birthday",
+      "location": "Las Piñas City",
+      "date": "2024-03-10"
+    },
+    {
+      "id": 4,
+      "url": "/placeholder.svg?height=400&width=600",
+      "caption": "Live Concert Setup",
+      "eventType": "Concert",
+      "location": "Imus, Cavite",
+      "date": "2024-03-25"
+    },
+    {
+      "id": 5,
+      "url": "/placeholder.svg?height=400&width=600",
+      "caption": "Graduation Ceremony",
+      "eventType": "Academic",
+      "location": "Dasmariñas, Cavite",
+      "date": "2024-04-05"
+    },
+    {
+      "id": 6,
+      "url": "/placeholder.svg?height=400&width=600",
+      "caption": "Garden Wedding",
+      "eventType": "Wedding",
+      "location": "Silang, Cavite",
+      "date": "2024-04-18"
+    }
+  ]
+}

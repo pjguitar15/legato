@@ -1,0 +1,52 @@
+{
+  "events": [
+    {
+      "id": 1,
+      "title": "Grand Wedding at Tagaytay Highlands",
+      "description": "A magical evening celebration with 300 guests featuring our premium sound and lighting package.",
+      "date": "2024-01-15",
+      "location": "Tagaytay Highlands, Cavite",
+      "eventType": "Wedding",
+      "package": "Platinum Package",
+      "image": "/placeholder.svg?height=300&width=500",
+      "highlights": [
+        "Full LED lighting truss setup",
+        "Crystal clear audio for 300 guests",
+        "Live band support with drum set",
+        "Romantic ambient lighting"
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Corporate Annual Awards Night",
+      "description": "Professional setup for a prestigious corporate event with presentations and live entertainment.",
+      "date": "2024-02-20",
+      "location": "Makati Shangri-La, Manila",
+      "eventType": "Corporate",
+      "package": "Premium Package",
+      "image": "/placeholder.svg?height=300&width=500",
+      "highlights": [
+        "Multi-screen presentation support",
+        "Wireless microphone system",
+        "Professional stage lighting",
+        "8-hour seamless operation"
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Debut Celebration Extravaganza",
+      "description": "An unforgettable 18th birthday party with dancing, live music, and spectacular light show.",
+      "date": "2024-03-10",
+      "location": "Las Piñas Event Center",
+      "eventType": "Birthday",
+      "package": "Premium Package",
+      "image": "/placeholder.svg?height=300&width=500",
+      "highlights": [
+        "Dynamic color-changing lights",
+        "DJ and live band setup",
+        "Fog machine effects",
+        "Dance floor lighting"
+      ]
+    }
+  ]
+}

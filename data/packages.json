@@ -1,0 +1,73 @@
+{
+  "packages": [
+    {
+      "id": 1,
+      "name": "Basic Setup",
+      "price": 6000,
+      "currency": "₱",
+      "description": "Perfect for acoustic sets and intimate live performances",
+      "features": [
+        "2 Wireless Microphones",
+        "Acoustic-Optimized Sound System",
+        "Basic Stage Lighting",
+        "4-hour Live Performance Support",
+        "Setup & Breakdown"
+      ],
+      "equipment": ["RCF ART 312A Speakers", "Yamaha MG10XU Mixer", "Shure SM58 Microphones", "Basic LED Stage Lights"],
+      "idealFor": "Acoustic performances, small venues, coffee shop gigs",
+      "maxGuests": 50
+    },
+    {
+      "id": 2,
+      "name": "Full Band Setup",
+      "price": 15000,
+      "currency": "₱",
+      "description": "Complete live band setup for rock performances",
+      "features": [
+        "4 Wireless Microphones",
+        "Professional Live Sound System",
+        "Dynamic Stage Lighting",
+        "Full Drum Kit & Backline",
+        "6-hour Live Performance Support",
+        "Professional Sound Engineer"
+      ],
+      "equipment": [
+        "RCF ART 745A Speakers",
+        "Allen & Heath SQ-5 Mixer",
+        "Pearl Export Drum Set",
+        "Moving Head LED Stage Lights",
+        "Fog Machine",
+        "Guitar/Bass Amplifiers"
+      ],
+      "idealFor": "Rock bands, live concerts, music festivals",
+      "maxGuests": 200,
+      "popular": true
+    },
+    {
+      "id": 3,
+      "name": "Full Concert Experience",
+      "price": 20000,
+      "currency": "₱",
+      "description": "Ultimate concert experience for major live events",
+      "features": [
+        "6 Wireless Microphones",
+        "Arena-Grade Sound System",
+        "Full Concert Lighting Rig",
+        "Complete Backline Setup",
+        "8-hour Concert Support",
+        "Dedicated Sound & Light Crew"
+      ],
+      "equipment": [
+        "RCF TTL55A Line Array",
+        "Allen & Heath dLive S3000",
+        "Pearl Reference Drum Set",
+        "Full LED Concert Lighting Truss",
+        "Haze Machine",
+        "Wireless In-Ear Monitor System",
+        "Professional Backline"
+      ],
+      "idealFor": "Major concerts, music festivals, arena shows",
+      "maxGuests": 500
+    }
+  ]
+}

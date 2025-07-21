@@ -1,0 +1,44 @@
+{
+  "company": {
+    "founded": "2022",
+    "mission": "Delivering unforgettable sound and lighting experiences since 2022, we transform ordinary events into extraordinary memories through professional-grade equipment and exceptional service.",
+    "vision": "To be the premier sounds and lights provider in Cavite and Metro Manila, known for reliability, quality, and innovation.",
+    "values": ["Professional Excellence", "Customer Satisfaction", "Reliable Service", "Innovation in Technology"],
+    "story": "Founded in 2022 by a team of audio and lighting enthusiasts, Legato Sounds and Lights began with a simple mission: to provide professional-grade equipment and services that make every event memorable. Starting with just a few pieces of equipment and a passion for perfect sound, we've grown to become one of the most trusted names in event production across Cavite and Metro Manila."
+  },
+  "team": [
+    {
+      "id": 1,
+      "name": "Philson S. Josol",
+      "role": "Founder & Lead Sound Engineer",
+      "experience": "4+ years",
+      "specialization": "Live Sound Engineering, Drummer",
+      "image": "/philson.jpg",
+      "bio": "Philson brings over 4 years of experience in live sound engineering and has worked with various artists and corporate clients across several areas in the Philippines."
+    },
+    {
+      "id": 2,
+      "name": "Ana Reyes",
+      "role": "Lighting Designer & Technician",
+      "experience": "6+ years",
+      "specialization": "Stage Lighting, Event Design",
+      "image": "/placeholder.svg?height=300&width=300",
+      "bio": "Ana specializes in creating stunning visual experiences through innovative lighting design, with expertise in both traditional and LED lighting systems."
+    },
+    {
+      "id": 3,
+      "name": "Jose Garcia",
+      "role": "Equipment Manager & Technician",
+      "experience": "5+ years",
+      "specialization": "Equipment Maintenance, Setup Coordination",
+      "image": "/placeholder.svg?height=300&width=300",
+      "bio": "Jose ensures all our equipment is in perfect condition and coordinates seamless setup and breakdown for every event."
+    }
+  ],
+  "achievements": [
+    "500+ Successful Events",
+    "100% Client Satisfaction Rate",
+    "Trusted by 200+ Repeat Clients",
+    "Coverage Across Cavite & Metro Manila"
+  ]
+}

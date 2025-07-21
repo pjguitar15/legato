@@ -1,0 +1,38 @@
+{
+  "name": "Legato Sounds and Lights",
+  "tagline": "Professional Live Sound & Stage Lighting",
+  "description": "Premium live sound engineering and stage lighting, concerts, and high-energy events across Cavite, Metro Manila, and nearby areas.",
+  "location": "Trece Martires, Cavite, Philippines",
+  "coverage": "Serving Rock Bands & Live Music Events - Cavite, Metro Manila, and Nearby Areas",
+  "stats": [
+    {
+      "value": "500+",
+      "label": "Live Shows"
+    },
+    {
+      "value": "3+",
+      "label": "Years Of Service"
+    },
+    {
+      "value": "5.0⭐",
+      "label": "Service Rating"
+    }
+  ],
+  "contact": {
+    "phone": "09762737247 ",
+    "whatsapp": "+63 917 123 4567",
+    "email": "info@legatosounds.com",
+    "facebook": "https://facebook.com/legatosounds",
+    "facebookPageId": "legatosounds",
+    "instagram": "https://instagram.com/legatosounds"
+  },
+  "address": {
+    "street": "123 Rock Street, Trece Martires City",
+    "city": "Cavite",
+    "zipCode": "4109",
+    "coordinates": {
+      "lat": 14.2833,
+      "lng": 120.8667
+    }
+  }
+}

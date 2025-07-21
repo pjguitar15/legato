@@ -1,0 +1,44 @@
+{
+  "faqs": [
+    {
+      "id": 1,
+      "question": "How far in advance should I book your services?",
+      "answer": "We recommend booking at least 2-4 weeks in advance, especially for weekend events. However, we can accommodate last-minute bookings based on availability."
+    },
+    {
+      "id": 2,
+      "question": "Do you provide services outside Cavite and Metro Manila?",
+      "answer": "Yes, we can provide services to nearby provinces. Additional transportation fees may apply depending on the location and distance."
+    },
+    {
+      "id": 3,
+      "question": "What's included in the setup and breakdown service?",
+      "answer": "Our team handles complete setup before your event and breakdown after. This includes equipment positioning, sound check, lighting programming, and ensuring everything is working perfectly."
+    },
+    {
+      "id": 4,
+      "question": "Can you accommodate special requests or custom setups?",
+      "answer": "We work closely with clients to customize our services based on specific needs, venue requirements, and event themes."
+    },
+    {
+      "id": 5,
+      "question": "Do you have backup equipment in case of technical issues?",
+      "answer": "Yes, we always bring backup equipment for critical components to ensure your event runs smoothly without any interruptions."
+    },
+    {
+      "id": 6,
+      "question": "What payment methods do you accept?",
+      "answer": "We accept cash, bank transfers, and major credit cards. A 50% deposit is required to secure your booking, with the balance due on the event day."
+    },
+    {
+      "id": 7,
+      "question": "Do you provide a technician during the event?",
+      "answer": "Yes, all our packages include a dedicated technician who will be present throughout your event to ensure everything runs perfectly and handle any adjustments needed."
+    },
+    {
+      "id": 8,
+      "question": "Can you work with live bands or DJs?",
+      "answer": "Definitely! Our equipment is designed to work seamlessly with live bands, DJs, and other performers. We provide all necessary connections and support."
+    }
+  ]
+}
