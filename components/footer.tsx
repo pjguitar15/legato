@@ -16,12 +16,14 @@ import { useCompanyData } from '@/hooks/use-company-data'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useTheme } from 'next-themes'
 import { useState, useEffect } from 'react'
+import { useMessenger } from '@/contexts/messenger-context'
 
 export default function Footer() {
   const currentYear = new Date().getFullYear()
   const { companyData, isLoading } = useCompanyData()
   const { theme } = useTheme()
   const [mounted, setMounted] = useState(false)
+  const { openMessenger } = useMessenger()
 
   useEffect(() => {
     setMounted(true)
@@ -93,16 +95,13 @@ export default function Footer() {
                   <Facebook className='w-5 h-5' />
                 </Link>
               )}
-              {companyData.socialMedia?.messenger && (
-                <Link
-                  href={companyData.socialMedia.messenger}
-                  target='_blank'
-                  className='p-2 bg-background rounded-lg hover:bg-accent transition-colors glow-hover'
-                  title='Facebook Messenger'
-                >
-                  <MessageCircle className='w-5 h-5' />
-                </Link>
-              )}
+              <button
+                onClick={openMessenger}
+                className='p-2 bg-background rounded-lg hover:bg-accent transition-colors glow-hover'
+                title='Facebook Messenger'
+              >
+                <MessageCircle className='w-5 h-5' />
+              </button>
               {companyData.socialMedia?.youtube && (
                 <Link
                   href={companyData.socialMedia.youtube}

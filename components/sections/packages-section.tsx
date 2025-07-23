@@ -1,8 +1,15 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Check, Star, MessageCircle } from 'lucide-react'
+import {
+  Check,
+  Star,
+  MessageCircle,
+  ChevronDown,
+  ChevronUp,
+} from 'lucide-react'
 import { SkeletonPackage, SkeletonText } from '@/components/ui/skeleton'
+import { useMessenger } from '@/contexts/messenger-context'
 
 interface Package {
   _id: string
@@ -20,6 +27,10 @@ interface Package {
 export default function PackagesSection() {
   const [packages, setPackages] = useState<Package[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [expandedEquipment, setExpandedEquipment] = useState<Set<string>>(
+    new Set(),
+  )
+  const { openMessenger } = useMessenger()
 
   useEffect(() => {
     fetchPackages()
@@ -42,7 +53,19 @@ export default function PackagesSection() {
   }
 
   const handleMessenger = () => {
-    // window.open(companyData.contact.messenger, '_blank')
+    openMessenger()
+  }
+
+  const toggleEquipmentExpansion = (packageId: string) => {
+    setExpandedEquipment((prev) => {
+      const newSet = new Set(prev)
+      if (newSet.has(packageId)) {
+        newSet.delete(packageId)
+      } else {
+        newSet.add(packageId)
+      }
+      return newSet
+    })
   }
 
   if (isLoading) {
@@ -110,11 +133,19 @@ export default function PackagesSection() {
               <div className='text-center mb-6'>
                 <h3 className='text-2xl font-bold mb-2'>{pkg.name}</h3>
                 <p className='text-muted-foreground mb-4'>{pkg.description}</p>
-                <div className='flex items-baseline justify-center mb-2'>
-                  <span className='text-4xl font-bold text-gradient'>
-                    {pkg.currency}
-                    {pkg.price.toLocaleString()}
+                <div className='flex flex-col items-center mb-2'>
+                  <span className='text-xs font-medium text-muted-foreground/80 uppercase tracking-wide mb-1'>
+                    starts at
                   </span>
+                  <div className='flex items-baseline'>
+                    <span className='text-4xl font-bold text-gradient'>
+                      {pkg.currency}
+                      {pkg.price.toLocaleString()}
+                    </span>
+                    <span className='text-sm text-muted-foreground ml-1'>
+                      / per event
+                    </span>
+                  </div>
                 </div>
                 <p className='text-sm text-muted-foreground'>
                   Perfect for {pkg.idealFor} • Up to {pkg.maxGuests} guests
@@ -147,10 +178,32 @@ export default function PackagesSection() {
                         {item}
                       </div>
                     ))}
+                    {expandedEquipment.has(pkg._id) &&
+                      pkg.equipment.slice(3).map((item, index) => (
+                        <div
+                          key={index + 3}
+                          className='text-xs text-muted-foreground flex items-center'
+                        >
+                          <span className='w-1.5 h-1.5 bg-[hsl(var(--primary))] rounded-full mr-2'></span>
+                          {item}
+                        </div>
+                      ))}
                     {pkg.equipment.length > 3 && (
-                      <div className='text-xs text-muted-foreground italic'>
-                        +{pkg.equipment.length - 3} more items
-                      </div>
+                      <button
+                        onClick={() => toggleEquipmentExpansion(pkg._id)}
+                        className='text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center space-x-1 cursor-pointer'
+                      >
+                        <span>
+                          {expandedEquipment.has(pkg._id)
+                            ? `-${pkg.equipment.length - 3} less items`
+                            : `+${pkg.equipment.length - 3} more items`}
+                        </span>
+                        {expandedEquipment.has(pkg._id) ? (
+                          <ChevronUp className='w-3 h-3' />
+                        ) : (
+                          <ChevronDown className='w-3 h-3' />
+                        )}
+                      </button>
                     )}
                   </div>
                 </div>

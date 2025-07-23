@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { ChevronDown, ChevronUp, HelpCircle } from 'lucide-react'
 import { SkeletonFAQ, SkeletonText } from '@/components/ui/skeleton'
+import { useMessenger } from '@/contexts/messenger-context'
 
 interface FAQ {
   _id: string
@@ -15,6 +16,7 @@ export default function FAQSection() {
   const [faqs, setFaqs] = useState<FAQ[]>([])
   const [openIndex, setOpenIndex] = useState<number | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const { openMessenger } = useMessenger()
 
   useEffect(() => {
     fetchFaqs()
@@ -120,7 +122,7 @@ export default function FAQSection() {
             >
               <button
                 onClick={() => toggleFAQ(index)}
-                className='w-full flex items-center justify-between p-6 text-left hover:bg-accent/50 transition-colors'
+                className='w-full flex items-center justify-between p-6 text-left hover:bg-accent/50 transition-colors cursor-pointer'
               >
                 <h3 className='text-lg font-semibold pr-4'>{faq.question}</h3>
                 <div className='flex-shrink-0'>
@@ -158,10 +160,13 @@ export default function FAQSection() {
             questions about our services.
           </p>
           <div className='flex flex-col sm:flex-row gap-4 justify-center'>
-            <button className='bg-[hsl(var(--primary))] text-primary-foreground px-8 py-3 rounded-lg hover:bg-[hsl(var(--primary))]/90 transition-colors font-semibold'>
+            <button
+              onClick={openMessenger}
+              className='bg-[hsl(var(--primary))] text-primary-foreground px-8 py-3 rounded-lg hover:bg-[hsl(var(--primary))]/90 transition-colors font-semibold cursor-pointer'
+            >
               Contact Us Today
             </button>
-            <button className='bg-secondary text-secondary-foreground hover:bg-secondary/80 px-8 py-3 rounded-lg transition-colors font-semibold'>
+            <button className='bg-secondary text-secondary-foreground hover:bg-secondary/80 px-8 py-3 rounded-lg transition-colors font-semibold cursor-pointer'>
               View Our Services
             </button>
           </div>

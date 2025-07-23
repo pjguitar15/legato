@@ -9,6 +9,7 @@ import {
   SkeletonStats,
   SkeletonCard,
 } from '@/components/ui/skeleton'
+import { useMessenger } from '@/contexts/messenger-context'
 
 interface AboutData {
   _id?: string
@@ -36,6 +37,7 @@ interface AboutData {
 export default function AboutSection() {
   const [aboutData, setAboutData] = useState<AboutData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const { openMessenger } = useMessenger()
 
   useEffect(() => {
     fetchAbout()
@@ -323,11 +325,8 @@ export default function AboutSection() {
           </p>
           <div className='flex flex-col sm:flex-row gap-4 justify-center'>
             <button
-              onClick={() => {
-                const contactSection = document.getElementById('contact')
-                contactSection?.scrollIntoView({ behavior: 'smooth' })
-              }}
-              className='bg-[hsl(var(--primary))] text-primary-foreground px-8 py-3 rounded-lg hover:bg-[hsl(var(--primary))]/90 transition-colors font-semibold hover:shadow-lg'
+              onClick={openMessenger}
+              className='bg-[hsl(var(--primary))] text-primary-foreground px-8 py-3 rounded-lg hover:bg-[hsl(var(--primary))]/90 transition-colors font-semibold hover:shadow-lg cursor-pointer'
             >
               Get Started Today
             </button>
@@ -336,7 +335,7 @@ export default function AboutSection() {
                 const packagesSection = document.getElementById('packages')
                 packagesSection?.scrollIntoView({ behavior: 'smooth' })
               }}
-              className='bg-secondary text-secondary-foreground hover:bg-secondary/80 px-8 py-3 rounded-lg transition-colors font-semibold hover:shadow-lg'
+              className='bg-secondary text-secondary-foreground hover:bg-secondary/80 px-8 py-3 rounded-lg transition-colors font-semibold hover:shadow-lg cursor-pointer'
             >
               View Our Services
             </button>

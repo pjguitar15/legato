@@ -205,7 +205,7 @@ export default function EventsSection() {
                         <li>
                           <button
                             onClick={() => toggleHighlights(event._id)}
-                            className='text-xs text-primary hover:text-primary/80 transition-colors flex items-center'
+                            className='text-xs text-primary hover:text-primary/80 transition-colors flex items-center cursor-pointer'
                           >
                             {expandedHighlights.has(event._id) ? (
                               <>
@@ -239,7 +239,7 @@ export default function EventsSection() {
         {/* Show More Button */}
         {events.length > 6 && (
           <div className='text-center mt-12'>
-            <button className='bg-secondary text-secondary-foreground hover:bg-secondary/80 px-8 py-3 rounded-lg font-semibold transition-colors'>
+            <button className='bg-secondary text-secondary-foreground hover:bg-secondary/80 px-8 py-3 rounded-lg font-semibold transition-colors cursor-pointer'>
               View All Events ({events.length})
             </button>
           </div>

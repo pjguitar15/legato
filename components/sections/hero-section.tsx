@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { MessageCircle, Phone, Music, Zap, Volume2 } from 'lucide-react'
 import { useCompanyData } from '@/hooks/use-company-data'
+import { useMessenger } from '@/contexts/messenger-context'
 import { SkeletonHero } from '@/components/ui/skeleton'
 import Image from 'next/image'
 import heroBg1 from '@/public/hero-bg.jpg'
@@ -17,6 +18,7 @@ import { motion, AnimatePresence, type Variants } from 'framer-motion'
 export default function HeroSection() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const { companyData, isLoading } = useCompanyData()
+  const { openMessenger } = useMessenger()
 
   const heroImages = [
     heroBg1,
@@ -36,9 +38,7 @@ export default function HeroSection() {
   }, [heroImages.length])
 
   const handleMessenger = () => {
-    if (companyData?.socialMedia?.messenger) {
-      window.open(companyData.socialMedia.messenger, '_blank')
-    }
+    openMessenger()
   }
 
   const handleCall = () => {
@@ -193,13 +193,13 @@ export default function HeroSection() {
             className='flex justify-center space-x-8 mb-8'
           >
             <motion.div variants={iconVariants}>
-              <Volume2 className='w-8 h-8 text-primary' />
+              <Volume2 className='w-8 h-8 text-white' />
             </motion.div>
             <motion.div variants={iconVariants}>
-              <Zap className='w-8 h-8 text-primary' />
+              <Zap className='w-8 h-8 text-white' />
             </motion.div>
             <motion.div variants={iconVariants}>
-              <Music className='w-8 h-8 text-primary' />
+              <Music className='w-8 h-8 text-white' />
             </motion.div>
           </motion.div>
 
@@ -216,10 +216,10 @@ export default function HeroSection() {
                 whileHover={{ scale: 1.05 }}
                 transition={{ type: 'spring', stiffness: 300 }}
               >
-                <div className='text-3xl sm:text-4xl font-bold text-primary mb-2'>
+                <div className='text-3xl sm:text-4xl font-bold text-white mb-2'>
                   {stat.value}
                 </div>
-                <div className='text-gray-300 font-semibold'>{stat.label}</div>
+                <div className='text-white font-semibold'>{stat.label}</div>
               </motion.div>
             ))}
           </motion.div>
@@ -263,24 +263,6 @@ export default function HeroSection() {
                 repeatType: 'reverse',
               }}
             ></motion.p>
-          </motion.div>
-
-          {/* Scroll Indicator with Framer Motion */}
-          <motion.div
-            className='absolute bottom-8 left-1/2 transform -translate-x-1/2'
-            animate={{ y: [0, -10, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-          >
-            <motion.div
-              className='w-6 h-10 border-2 border-primary/50 rounded-full flex justify-center'
-              whileHover={{ scale: 1.1, borderColor: 'hsl(var(--primary))' }}
-            >
-              <motion.div
-                className='w-1 h-3 bg-[hsl(var(--primary))] rounded-full mt-2'
-                animate={{ opacity: [0.5, 1, 0.5] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-              />
-            </motion.div>
           </motion.div>
         </motion.div>
       </div>

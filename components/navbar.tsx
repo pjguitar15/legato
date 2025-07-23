@@ -5,6 +5,7 @@ import { Menu, X, Volume2, Zap } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { useCompanyData } from '@/hooks/use-company-data'
+import { useMessenger } from '@/contexts/messenger-context'
 import Image from 'next/image'
 import whiteLogo from '@/public/Legato Landscape.png'
 import blackLogo from '@/public/Legato Landscape Black.png'
@@ -16,6 +17,7 @@ export default function Navbar() {
   const { theme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const { companyData, isLoading } = useCompanyData()
+  const { openMessenger } = useMessenger()
 
   useEffect(() => {
     setMounted(true)
@@ -56,9 +58,7 @@ export default function Navbar() {
   }
 
   const handleMessenger = () => {
-    if (companyData?.socialMedia?.messenger) {
-      window.open(companyData.socialMedia.messenger, '_blank')
-    }
+    openMessenger()
   }
 
   if (!mounted) {

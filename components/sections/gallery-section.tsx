@@ -149,10 +149,10 @@ export default function GallerySection() {
                 <button
                   key={type}
                   onClick={() => setFilter(type)}
-                  className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                  className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 hover:scale-105 hover:shadow-lg cursor-pointer ${
                     filter === type
-                      ? 'bg-[hsl(var(--primary))] text-primary-foreground shadow-md'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
+                      ? 'bg-[hsl(var(--primary))] text-primary-foreground shadow-md hover:shadow-xl hover:bg-[hsl(var(--primary))]/90'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-accent/80 hover:shadow-md'
                   }`}
                 >
                   {type === 'all' ? 'All Events' : type}
@@ -214,7 +214,7 @@ export default function GallerySection() {
             </p>
             <button
               onClick={() => setFilter('all')}
-              className='bg-[hsl(var(--primary))] text-primary-foreground px-6 py-2 rounded-lg hover:bg-[hsl(var(--primary))]/90 transition-colors'
+              className='bg-[hsl(var(--primary))] text-primary-foreground px-6 py-2 rounded-lg hover:bg-[hsl(var(--primary))]/90 transition-colors cursor-pointer'
             >
               View All Events
             </button>
@@ -231,7 +231,7 @@ export default function GallerySection() {
               {/* Close Button */}
               <button
                 onClick={closeLightbox}
-                className='absolute top-4 right-4 z-10 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors'
+                className='absolute top-4 right-4 z-10 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors cursor-pointer'
               >
                 <X className='w-6 h-6' />
               </button>
@@ -244,7 +244,7 @@ export default function GallerySection() {
                       e.stopPropagation()
                       navigateLightbox('prev')
                     }}
-                    className='absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-3 rounded-full hover:bg-black/70 transition-colors z-10'
+                    className='absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-3 rounded-full hover:bg-black/70 transition-colors z-10 cursor-pointer'
                   >
                     <ChevronLeft className='w-6 h-6' />
                   </button>
@@ -253,7 +253,7 @@ export default function GallerySection() {
                       e.stopPropagation()
                       navigateLightbox('next')
                     }}
-                    className='absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-3 rounded-full hover:bg-black/70 transition-colors z-10'
+                    className='absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-3 rounded-full hover:bg-black/70 transition-colors z-10 cursor-pointer'
                   >
                     <ChevronRight className='w-6 h-6' />
                   </button>

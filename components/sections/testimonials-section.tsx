@@ -131,14 +131,14 @@ export default function TestimonialsSection() {
             <div className='absolute top-6 right-6 flex space-x-2'>
               <button
                 onClick={prevTestimonial}
-                className='p-2 rounded-full bg-background hover:bg-accent transition-colors'
+                className='p-2 rounded-full bg-background hover:bg-accent transition-colors cursor-pointer'
                 disabled={testimonials.length <= 1}
               >
                 <ChevronLeft className='w-5 h-5' />
               </button>
               <button
                 onClick={nextTestimonial}
-                className='p-2 rounded-full bg-background hover:bg-accent transition-colors'
+                className='p-2 rounded-full bg-background hover:bg-accent transition-colors cursor-pointer'
                 disabled={testimonials.length <= 1}
               >
                 <ChevronRight className='w-5 h-5' />
@@ -202,7 +202,7 @@ export default function TestimonialsSection() {
                 <button
                   key={index}
                   onClick={() => setActiveTestimonial(index)}
-                  className={`w-3 h-3 rounded-full transition-colors ${
+                  className={`w-3 h-3 rounded-full transition-colors cursor-pointer ${
                     index === activeTestimonial
                       ? 'bg-[hsl(var(--primary))]'
                       : 'bg-muted'

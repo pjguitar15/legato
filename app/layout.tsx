@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { Poppins, Montserrat } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/components/theme-provider'
+import { MessengerProvider } from '@/contexts/messenger-context'
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -76,7 +77,7 @@ export default function RootLayout({
           disableTransitionOnChange={false}
           storageKey='legato-theme'
         >
-          {children}
+          <MessengerProvider>{children}</MessengerProvider>
         </ThemeProvider>
       </body>
     </html>

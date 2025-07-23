@@ -150,10 +150,8 @@ export default function StatsDashboard() {
                 <Icon className={`w-6 h-6 ${item.color}`} />
               </div>
               <div>
-                <p className='text-sm font-medium text-muted-foreground'>
-                  {item.label}
-                </p>
-                <p className='text-2xl font-bold'>{item.value}</p>
+                <p className='text-sm font-medium text-white'>{item.label}</p>
+                <p className='text-2xl font-bold text-white'>{item.value}</p>
               </div>
             </div>
           </div>

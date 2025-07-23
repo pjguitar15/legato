@@ -5,14 +5,14 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { useCompanyData } from '@/hooks/use-company-data'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useMessenger } from '@/contexts/messenger-context'
 
 export default function ContactSection() {
   const { companyData, isLoading } = useCompanyData()
+  const { openMessenger } = useMessenger()
 
   const handleMessenger = () => {
-    if (companyData?.socialMedia?.messenger) {
-      window.open(companyData.socialMedia.messenger, '_blank')
-    }
+    openMessenger()
   }
 
   const handleCall = () => {
