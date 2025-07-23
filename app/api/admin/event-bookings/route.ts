@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
 
     // Get bookings with pagination
     const bookings = await EventBooking.find(filter)
-      .sort({ eventDate: 1, createdAt: -1 })
+      .sort({ createdAt: -1, eventDate: 1 })
       .skip(skip)
       .limit(limit)
       .lean()
