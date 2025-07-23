@@ -140,7 +140,7 @@ export default function PackagesSection() {
                   <div className='flex items-baseline'>
                     <span className='text-4xl font-bold text-gradient'>
                       {pkg.currency}
-                      {pkg.price.toLocaleString()}
+                      {pkg.price?.toLocaleString() ?? '0'}
                     </span>
                     <span className='text-sm text-muted-foreground ml-1'>
                       / per event
@@ -153,14 +153,16 @@ export default function PackagesSection() {
               </div>
 
               {/* Features */}
-              <div className='space-y-3 mb-8'>
-                {pkg.features.map((feature, index) => (
-                  <div key={index} className='flex items-start'>
-                    <Check className='w-5 h-5 text-primary mr-3 mt-0.5 flex-shrink-0' />
-                    <span className='text-sm'>{feature}</span>
-                  </div>
-                ))}
-              </div>
+              {pkg.features && pkg.features.length > 0 && (
+                <div className='space-y-3 mb-8'>
+                  {pkg.features.map((feature, index) => (
+                    <div key={index} className='flex items-start'>
+                      <Check className='w-5 h-5 text-primary mr-3 mt-0.5 flex-shrink-0' />
+                      <span className='text-sm'>{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
 
               {/* Equipment Preview */}
               {pkg.equipment && pkg.equipment.length > 0 && (

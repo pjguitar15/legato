@@ -298,7 +298,7 @@ export default function PackagesPage() {
                   <div className='flex items-baseline space-x-1'>
                     <span className='text-2xl font-bold text-primary'>
                       {pkg.currency}
-                      {pkg.price.toLocaleString()}
+                      {pkg.price?.toLocaleString() ?? '0'}
                     </span>
                     <span className='text-muted-foreground text-sm'>
                       per event

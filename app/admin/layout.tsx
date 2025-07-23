@@ -28,6 +28,7 @@ import { logout } from '@/lib/auth'
 
 const adminNavItems = [
   { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
+  { name: 'Event Bookings', href: '/admin/event-bookings', icon: Calendar },
   { name: 'Packages', href: '/admin/packages', icon: Package },
   { name: 'Equipment', href: '/admin/equipment', icon: Wrench },
   { name: 'Gallery', href: '/admin/gallery', icon: ImageIcon },

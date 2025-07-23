@@ -1,6 +1,22 @@
-import mongoose from 'mongoose'
+import mongoose, { Schema, Document } from 'mongoose'
 
-const EquipmentItemSchema = new mongoose.Schema({
+export interface IEquipmentItem {
+  name: string
+  brand: string
+  type: string
+  description: string
+  features: string[]
+  image?: string
+}
+
+export interface IEquipmentCategory extends Document {
+  name: string
+  items: IEquipmentItem[]
+  createdAt: Date
+  updatedAt: Date
+}
+
+const EquipmentItemSchema = new Schema<IEquipmentItem>({
   name: { type: String, required: true },
   brand: { type: String, required: true },
   type: { type: String, required: true },
@@ -9,7 +25,7 @@ const EquipmentItemSchema = new mongoose.Schema({
   image: { type: String },
 })
 
-const EquipmentCategorySchema = new mongoose.Schema(
+const EquipmentCategorySchema = new Schema<IEquipmentCategory>(
   {
     name: { type: String, required: true },
     items: [EquipmentItemSchema],
@@ -19,5 +35,11 @@ const EquipmentCategorySchema = new mongoose.Schema(
   },
 )
 
+// Index for efficient querying
+EquipmentCategorySchema.index({ name: 1 })
+
 export default mongoose.models.EquipmentCategory ||
-  mongoose.model('EquipmentCategory', EquipmentCategorySchema)
+  mongoose.model<IEquipmentCategory>(
+    'EquipmentCategory',
+    EquipmentCategorySchema,
+  )
