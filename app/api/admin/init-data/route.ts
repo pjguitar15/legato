@@ -328,11 +328,159 @@ export async function POST() {
       console.log('ℹ️  Equipment data already exists, skipping...')
     }
 
+    // Initialize Packages data
+    console.log('🔍 Checking for existing Packages data...')
+    const existingPackages = await Package.find()
+    console.log('📦 Existing Packages count:', existingPackages.length)
+    if (existingPackages.length === 0) {
+      console.log('📦 Creating sample Packages data...')
+      const packagesData = [
+        {
+          name: 'Basic Setup',
+          price: 6000,
+          currency: '₱',
+          description:
+            'Perfect for acoustic sets and intimate live performances',
+          features: [
+            '2 Wireless Microphones',
+            'Acoustic-Optimized Sound System',
+            'Basic Stage Lighting',
+            '4-hour Live Performance Support',
+            'Setup & Breakdown',
+          ],
+          equipment: [
+            'RCF ART 312A Speakers',
+            'Yamaha MG10XU Mixer',
+            'Shure SM58 Microphones',
+            'Basic LED Stage Lights',
+          ],
+          idealFor: 'Acoustic performances, small venues, coffee shop gigs',
+          maxGuests: 50,
+          popular: false,
+          recommendedEvents: [
+            'Acoustic gigs',
+            'Coffee shop sessions',
+            'Birthday at home',
+          ],
+        },
+        {
+          name: 'Full Band Setup',
+          price: 15000,
+          currency: '₱',
+          description: 'Complete live band setup for rock performances',
+          features: [
+            '4 Wireless Microphones',
+            'Professional Live Sound System',
+            'Dynamic Stage Lighting',
+            'Full Drum Kit & Backline',
+            '6-hour Live Performance Support',
+            'Professional Sound Engineer',
+          ],
+          equipment: [
+            'RCF ART 745A Speakers',
+            'Allen & Heath SQ-5 Mixer',
+            'Pearl Export Drum Set',
+            'Moving Head LED Stage Lights',
+            'Fog Machine',
+            'Guitar/Bass Amplifiers',
+          ],
+          idealFor: 'Rock bands, live concerts, music festivals',
+          maxGuests: 200,
+          popular: true,
+          recommendedEvents: ['Bar gigs', 'Corporate party', 'School fair'],
+        },
+        {
+          name: 'Full Concert Experience',
+          price: 20000,
+          currency: '₱',
+          description: 'Ultimate concert experience for major live events',
+          features: [
+            '6 Wireless Microphones',
+            'Arena-Grade Sound System',
+            'Full Concert Lighting Rig',
+            'Complete Backline Setup',
+            '8-hour Concert Support',
+            'Dedicated Sound & Light Crew',
+          ],
+          equipment: [
+            'RCF TTL55A Line Array',
+            'Allen & Heath dLive S3000',
+            'Pearl Reference Drum Set',
+            'Full LED Concert Lighting Truss',
+            'Haze Machine',
+            'Wireless In-Ear Monitor System',
+            'Professional Backline',
+          ],
+          idealFor: 'Major concerts, music festivals, arena shows',
+          maxGuests: 500,
+          popular: false,
+          recommendedEvents: [
+            'Town fiesta',
+            'Outdoor concert',
+            'Large corporate show',
+          ],
+        },
+      ]
+
+      for (const pkg of packagesData) {
+        await Package.create(pkg)
+      }
+      console.log('✓ Packages data initialized')
+    } else {
+      console.log('ℹ️  Packages data already exists, skipping...')
+    }
+
+    // Initialize Recent Events mapped to packages
+    console.log('🔍 Checking for existing Events data...')
+    const existingEvents = await Event.find()
+    if (existingEvents.length === 0) {
+      console.log('📅 Creating sample Events data linked to packages...')
+      const sampleEvents = [
+        {
+          title: 'Christmas Party at Versailles Palace, Alabang',
+          description: 'Corporate year-end party with live band and program',
+          date: '2025-12-10',
+          location: 'Versailles Palace, Alabang',
+          eventType: 'Christmas Party',
+          package: 'Semi Basic Setup',
+          image: '/placeholder.jpg',
+          highlights: ['Subwoofers', 'Basic lighting'],
+        },
+        {
+          title: 'Bar Gigs Night — Makati',
+          description: 'Full band setup for bar residency',
+          date: '2025-11-05',
+          location: 'Makati City',
+          eventType: 'Bar gig',
+          package: 'Full Band Setup',
+          image: '/placeholder.jpg',
+          highlights: ['Moving heads', 'Fog machine'],
+        },
+        {
+          title: 'Town Fiesta Open Grounds',
+          description: 'Outdoor concert stage with full concert experience',
+          date: '2025-10-15',
+          location: 'Silang, Cavite',
+          eventType: 'Town fiesta',
+          package: 'Full Concert Experience',
+          image: '/placeholder.jpg',
+          highlights: ['Line array', 'LED truss'],
+        },
+      ]
+
+      for (const ev of sampleEvents) {
+        await Event.create(ev)
+      }
+      console.log('✓ Events data initialized')
+    } else {
+      console.log('ℹ️  Events data already exists, skipping...')
+    }
+
     console.log('🎉 All data initialization completed successfully!')
     return NextResponse.json({
       success: true,
       message:
-        'Original About Us, Company, and Equipment data has been successfully stored in the database!',
+        'Original About Us, Company, Equipment, and Packages data has been successfully stored in the database!',
     })
   } catch (error) {
     console.error('❌ Error initializing data:', error)

@@ -37,7 +37,7 @@ export default function TestimonialsSection() {
   const fetchTestimonials = async () => {
     try {
       setIsLoading(true)
-      const response = await fetch('/api/admin/testimonials')
+      const response = await fetch('/api/testimonials')
       const data = await response.json()
 
       if (data.success) {

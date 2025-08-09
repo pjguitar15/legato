@@ -13,6 +13,7 @@ export interface IEventBooking extends Document {
   expenses: number
   location: string
   mixerAndSpeaker: string
+  driver: string
   notes: string
   createdAt: Date
   updatedAt: Date
@@ -28,12 +29,10 @@ const EventBookingSchema = new Schema<IEventBooking>(
     },
     eventType: {
       type: String,
-      required: true,
       trim: true,
     },
     eventDate: {
       type: Date,
-      required: true,
     },
     crew: [
       {
@@ -43,27 +42,22 @@ const EventBookingSchema = new Schema<IEventBooking>(
     ],
     clientName: {
       type: String,
-      required: true,
       trim: true,
     },
     agreedAmount: {
       type: Number,
-      required: true,
       min: 0,
     },
     package: {
       type: String,
-      required: true,
       trim: true,
     },
     eventTime: {
       type: String,
-      required: true,
       trim: true,
     },
     ingress: {
       type: String,
-      required: true,
       trim: true,
     },
     expenses: {
@@ -73,12 +67,14 @@ const EventBookingSchema = new Schema<IEventBooking>(
     },
     location: {
       type: String,
-      required: true,
       trim: true,
     },
     mixerAndSpeaker: {
       type: String,
-      required: true,
+      trim: true,
+    },
+    driver: {
+      type: String,
       trim: true,
     },
     notes: {

@@ -36,7 +36,7 @@ export default function EquipmentSection() {
   const fetchEquipment = async () => {
     try {
       setIsLoading(true)
-      const response = await fetch('/api/admin/equipment')
+      const response = await fetch('/api/equipment')
       const data = await response.json()
 
       if (data.success && data.data) {

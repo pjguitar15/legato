@@ -30,7 +30,7 @@ interface CompanyData {
     weekends: string
     holidays: string
   }
-  stats: { value: string; label: string;}[]
+  stats: { value: string; label: string }[]
   serviceAreas: string[]
   founded: number
 }
@@ -49,7 +49,7 @@ export function useCompanyData() {
       setIsLoading(true)
       setError(null)
 
-      const response = await fetch('/api/admin/company')
+      const response = await fetch('/api/company')
       const data = await response.json()
 
       if (data.success && data.data) {

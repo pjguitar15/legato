@@ -10,6 +10,7 @@ export interface IPackage extends Document {
   idealFor: string
   maxGuests: number
   popular: boolean
+  recommendedEvents?: string[]
   createdAt: Date
   updatedAt: Date
 }
@@ -35,14 +36,18 @@ const PackageSchema = new Schema<IPackage>(
       required: true,
       default: '₱',
     },
-    features: [{
-      type: String,
-      required: true,
-    }],
-    equipment: [{
-      type: String,
-      required: true,
-    }],
+    features: [
+      {
+        type: String,
+        required: true,
+      },
+    ],
+    equipment: [
+      {
+        type: String,
+        required: true,
+      },
+    ],
     idealFor: {
       type: String,
       required: true,
@@ -56,13 +61,21 @@ const PackageSchema = new Schema<IPackage>(
       type: Boolean,
       default: false,
     },
+    recommendedEvents: [
+      {
+        type: String,
+        required: false,
+        default: [],
+      },
+    ],
   },
   {
     timestamps: true,
-  }
+  },
 )
 
 // Index for efficient querying
 PackageSchema.index({ name: 1 })
 
-export default mongoose.models.Package || mongoose.model<IPackage>('Package', PackageSchema)
+export default mongoose.models.Package ||
+  mongoose.model<IPackage>('Package', PackageSchema)

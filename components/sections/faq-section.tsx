@@ -25,7 +25,7 @@ export default function FAQSection() {
   const fetchFaqs = async () => {
     try {
       setIsLoading(true)
-      const response = await fetch('/api/admin/faq')
+      const response = await fetch('/api/faq')
       const data = await response.json()
 
       if (data.success) {

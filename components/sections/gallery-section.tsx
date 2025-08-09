@@ -27,7 +27,7 @@ export default function GallerySection() {
   const fetchGallery = async () => {
     try {
       setIsLoading(true)
-      const response = await fetch('/api/admin/gallery')
+      const response = await fetch('/api/gallery')
       const data = await response.json()
 
       if (data.success) {

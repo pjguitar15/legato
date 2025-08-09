@@ -160,7 +160,7 @@ export default function AmountCombobox({
                       <Button
                         size='sm'
                         onClick={addAmount}
-                        className='bg-primary text-primary-foreground'
+                        className='bg-[hsl(var(--primary))] text-primary-foreground'
                       >
                         <Plus className='h-4 w-4' />
                       </Button>
@@ -177,7 +177,7 @@ export default function AmountCombobox({
                     <Button
                       size='sm'
                       onClick={() => setShowAddForm(true)}
-                      className='w-full bg-primary text-primary-foreground'
+                      className='w-full bg-[hsl(var(--primary))] text-primary-foreground'
                     >
                       <Plus className='h-4 w-4 mr-2' />
                       Add New Amount

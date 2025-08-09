@@ -46,7 +46,7 @@ export default function AboutSection() {
   const fetchAbout = async () => {
     try {
       setIsLoading(true)
-      const response = await fetch('/api/admin/about')
+      const response = await fetch('/api/about')
       const data = await response.json()
 
       if (data.success && data.data) {

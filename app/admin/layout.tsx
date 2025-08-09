@@ -18,6 +18,8 @@ import {
   X,
   ClipboardList,
   LogOut,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from 'lucide-react'
 import Image from 'next/image'
 import whiteLogo from '@/public/Legato Landscape.png'
@@ -51,6 +53,7 @@ export default function AdminLayout({
   children: React.ReactNode
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const pathname = usePathname()
   const { theme } = useTheme()
   const [mounted, setMounted] = useState(false)
@@ -79,26 +82,41 @@ export default function AdminLayout({
 
         {/* Sidebar */}
         <div
-          className={`fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
-            sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-          }`}
+          className={`fixed inset-y-0 left-0 z-50 bg-card border-r border-border transform transition-all duration-300 ease-in-out lg:translate-x-0 ${
+            sidebarCollapsed ? 'w-16' : 'w-64'
+          } ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
         >
           <div className='flex items-center justify-between h-16 px-6 border-b border-border'>
             <div className='flex items-center space-x-3'>
-              <Image
-                src={theme === 'dark' ? whiteLogo : blackLogo}
-                alt='Legato Admin'
-                width={120}
-                height={40}
-                className='h-6 w-auto'
-              />
+              {!sidebarCollapsed && (
+                <Image
+                  src={theme === 'dark' ? whiteLogo : blackLogo}
+                  alt='Legato Admin'
+                  width={120}
+                  height={40}
+                  className='h-6 w-auto'
+                />
+              )}
             </div>
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className='lg:hidden p-2 rounded-lg hover:bg-accent transition-colors'
-            >
-              <X className='w-6 h-6' />
-            </button>
+            <div className='flex items-center'>
+              <button
+                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                className='hidden lg:flex hover:bg-accent transition-colors rounded-lg'
+                title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+              >
+                {sidebarCollapsed ? (
+                  <PanelLeftOpen className='w-4 h-4' />
+                ) : (
+                  <PanelLeftClose className='w-4 h-4' />
+                )}
+              </button>
+              <button
+                onClick={() => setSidebarOpen(false)}
+                className='lg:hidden p-2 rounded-lg hover:bg-accent transition-colors'
+              >
+                <X className='w-6 h-6' />
+              </button>
+            </div>
           </div>
 
           <nav className='mt-6 px-3'>
@@ -110,15 +128,21 @@ export default function AdminLayout({
                   <li key={item.name}>
                     <Link
                       href={item.href}
-                      className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
+                      className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors group ${
                         isActive
                           ? 'bg-[hsl(var(--primary))] text-primary-foreground'
                           : 'text-muted-foreground hover:text-foreground hover:bg-accent'
                       }`}
                       onClick={() => setSidebarOpen(false)}
+                      title={sidebarCollapsed ? item.name : undefined}
                     >
-                      <Icon className='w-5 h-5' />
-                      <span>{item.name}</span>
+                      <Icon className='w-5 h-5 flex-shrink-0' />
+                      {!sidebarCollapsed && <span>{item.name}</span>}
+                      {sidebarCollapsed && (
+                        <div className='absolute left-full ml-2 px-2 py-1 bg-popover text-popover-foreground text-sm rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50'>
+                          {item.name}
+                        </div>
+                      )}
                     </Link>
                   </li>
                 )
@@ -128,18 +152,22 @@ export default function AdminLayout({
         </div>
 
         {/* Main content */}
-        <div className='lg:pl-64'>
+        <div
+          className={`transition-all duration-300 ease-in-out ${
+            sidebarCollapsed ? 'lg:pl-16' : 'lg:pl-64'
+          }`}
+        >
           {/* Top bar */}
           <div className='sticky top-0 z-30 flex items-center justify-between h-16 px-6 bg-background/95 backdrop-blur-sm border-b border-border'>
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className='lg:hidden p-2 rounded-lg hover:bg-accent transition-colors'
-            >
-              <Menu className='w-6 h-6' />
-            </button>
-            <h1 className='text-xl font-display font-bold mt-5'>
-              Legato Admin
-            </h1>
+            <div className='flex items-center space-x-4'>
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className='lg:hidden p-2 rounded-lg hover:bg-accent transition-colors'
+              >
+                <Menu className='w-6 h-6' />
+              </button>
+              <h1 className='text-xl font-display font-bold'>Legato Admin</h1>
+            </div>
             <div className='flex items-center space-x-4'>
               <Link
                 href='/'

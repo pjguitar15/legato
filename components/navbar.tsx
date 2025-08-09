@@ -1,6 +1,14 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { usePathname, useRouter } from 'next/navigation'
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from '@/components/ui/dropdown-menu'
 import { Menu, X, Volume2, Zap } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/theme-toggle'
@@ -18,6 +26,8 @@ export default function Navbar() {
   const [mounted, setMounted] = useState(false)
   const { companyData, isLoading } = useCompanyData()
   const { openMessenger } = useMessenger()
+  const pathname = usePathname()
+  const router = useRouter()
 
   useEffect(() => {
     setMounted(true)
@@ -28,31 +38,44 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const navItems = [
-    { href: '#home', label: 'Home' },
-    { href: '#packages', label: 'Packages' },
-    { href: '#equipment', label: 'Equipment' },
-    { href: '#gallery', label: 'Gallery' },
-    { href: '#events', label: 'Events' },
-    { href: '#testimonials', label: 'Testimonials' },
-    { href: '#about', label: 'About' },
-    { href: '#contact', label: 'Contact' },
+  const navGroups = [
+    {
+      label: 'Explore',
+      items: [
+        { href: '#home', label: 'Home' },
+        { href: '#packages', label: 'Packages' },
+        { href: '#equipment', label: 'Equipment' },
+        { href: '#gallery', label: 'Gallery' },
+        { href: '#events', label: 'Events' },
+        { href: '#testimonials', label: 'Testimonials' },
+        { href: '#about', label: 'About' },
+        { href: '#contact', label: 'Contact' },
+      ],
+    },
+    {
+      label: 'Media',
+      items: [{ href: '/contents', label: 'Contents' }],
+    },
   ]
 
   const handleNavClick = (
     e: React.MouseEvent<HTMLAnchorElement>,
     href: string,
   ) => {
+    // If link is an app route, navigate normally
+    if (!href.startsWith('#')) return
     e.preventDefault()
+    // If not on homepage, go home then scroll
+    if (pathname !== '/') {
+      router.push('/' + href)
+      setIsMenuOpen(false)
+      return
+    }
     const targetId = href.replace('#', '')
     const targetElement = document.getElementById(targetId)
-
     if (targetElement) {
-      const offsetTop = targetElement.offsetTop - 80 // Account for fixed navbar
-      window.scrollTo({
-        top: offsetTop,
-        behavior: 'smooth',
-      })
+      const offsetTop = targetElement.offsetTop - 80
+      window.scrollTo({ top: offsetTop, behavior: 'smooth' })
     }
     setIsMenuOpen(false)
   }
@@ -87,19 +110,40 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation - grouped as dropdowns */}
           <div className='hidden md:block'>
-            <div className='ml-10 flex items-baseline space-x-4'>
-              {navItems.map((item) => (
-                <a
-                  key={item.href}
-                  href={item.href}
-                  onClick={(e) => handleNavClick(e, item.href)}
-                  className='text-foreground hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200'
-                >
-                  {item.label}
-                </a>
-              ))}
+            <div className='ml-10 flex items-center space-x-3'>
+              <DropdownMenu>
+                <DropdownMenuTrigger className='text-foreground hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors'>
+                  Explore
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  {navGroups[0].items.map((item) => (
+                    <DropdownMenuItem
+                      key={item.href}
+                      onSelect={(e) => {
+                        e.preventDefault()
+                        handleNavClick(
+                          { preventDefault: () => {} } as any,
+                          item.href,
+                        )
+                      }}
+                    >
+                      {item.label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <DropdownMenu>
+                <DropdownMenuTrigger className='text-foreground hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors'>
+                  Media
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onSelect={() => router.push('/contents')}>
+                    Contents
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
 
@@ -136,7 +180,10 @@ export default function Navbar() {
       {isMenuOpen && (
         <div className='md:hidden'>
           <div className='px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-background/95 backdrop-blur-sm border-b border-border'>
-            {navItems.map((item) => (
+            <div className='px-3 py-1 text-xs uppercase text-muted-foreground'>
+              Explore
+            </div>
+            {navGroups[0].items.map((item) => (
               <a
                 key={item.href}
                 href={item.href}
@@ -146,6 +193,16 @@ export default function Navbar() {
                 {item.label}
               </a>
             ))}
+            <div className='px-3 py-1 text-xs uppercase text-muted-foreground'>
+              Media
+            </div>
+            <Link
+              href='/contents'
+              className='text-foreground hover:text-primary block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200'
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Contents
+            </Link>
             <Button
               onClick={handleMessenger}
               className='w-full mt-4 bg-[hsl(var(--primary))] text-primary-foreground hover:bg-[hsl(var(--primary))]/90'

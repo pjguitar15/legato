@@ -9,7 +9,12 @@ import {
   ChevronUp,
 } from 'lucide-react'
 import { SkeletonPackage, SkeletonText } from '@/components/ui/skeleton'
-import { useMessenger } from '@/contexts/messenger-context'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 
 interface Package {
   _id: string
@@ -22,6 +27,7 @@ interface Package {
   idealFor: string
   maxGuests: number
   popular: boolean
+  recommendedEvents?: string[]
 }
 
 export default function PackagesSection() {
@@ -30,7 +36,7 @@ export default function PackagesSection() {
   const [expandedEquipment, setExpandedEquipment] = useState<Set<string>>(
     new Set(),
   )
-  const { openMessenger } = useMessenger()
+  const [selected, setSelected] = useState<Package | null>(null)
 
   useEffect(() => {
     fetchPackages()
@@ -39,7 +45,7 @@ export default function PackagesSection() {
   const fetchPackages = async () => {
     try {
       setIsLoading(true)
-      const response = await fetch('/api/admin/packages')
+      const response = await fetch('/api/packages')
       const data = await response.json()
 
       if (data.success) {
@@ -52,9 +58,7 @@ export default function PackagesSection() {
     }
   }
 
-  const handleMessenger = () => {
-    openMessenger()
-  }
+  const handleSelect = (pkg: Package) => setSelected(pkg)
 
   const toggleEquipmentExpansion = (packageId: string) => {
     setExpandedEquipment((prev) => {
@@ -213,7 +217,7 @@ export default function PackagesSection() {
 
               {/* CTA Button */}
               <button
-                onClick={handleMessenger}
+                onClick={() => handleSelect(pkg)}
                 className={`w-full py-3 px-6 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center space-x-2 ${
                   pkg.popular
                     ? 'bg-gradient-to-r from-emerald-400 to-emerald-600 text-white hover:from-emerald-500 hover:to-emerald-700 shadow-lg hover:shadow-xl'
@@ -234,13 +238,41 @@ export default function PackagesSection() {
             specific needs.
           </p>
           <button
-            onClick={handleMessenger}
+            onClick={() => setSelected(packages[0])}
             className='bg-secondary text-secondary-foreground hover:bg-secondary/80 px-8 py-3 rounded-lg font-semibold transition-colors'
           >
             Contact Us for Custom Quote
           </button>
         </div>
       </div>
+
+      <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>How would you like to contact us?</DialogTitle>
+          </DialogHeader>
+          {selected && (
+            <div className='space-y-4'>
+              <p className='text-sm text-muted-foreground'>
+                Package:{' '}
+                <span className='font-medium text-foreground'>
+                  {selected.name}
+                </span>
+              </p>
+              <div className='grid grid-cols-2 gap-3'>
+                {['Messenger', 'Telegram', 'Email', 'SMS'].map((label) => (
+                  <button
+                    key={label}
+                    className='rounded-lg border bg-card px-4 py-3 text-sm font-semibold transition hover:border-primary hover:shadow'
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </section>
   )
 }

@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { Poppins, Montserrat } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/components/theme-provider'
+import { Toaster as SonnerToaster } from '@/components/ui/sonner'
 import { MessengerProvider } from '@/contexts/messenger-context'
 
 const poppins = Poppins({
@@ -77,7 +78,10 @@ export default function RootLayout({
           disableTransitionOnChange={false}
           storageKey='legato-theme'
         >
-          <MessengerProvider>{children}</MessengerProvider>
+          <MessengerProvider>
+            {children}
+            <SonnerToaster position='top-center' richColors closeButton />
+          </MessengerProvider>
         </ThemeProvider>
       </body>
     </html>

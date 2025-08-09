@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import { MessageCircle, Phone, Music, Zap, Volume2 } from 'lucide-react'
 import { useCompanyData } from '@/hooks/use-company-data'
-import { useMessenger } from '@/contexts/messenger-context'
 import { SkeletonHero } from '@/components/ui/skeleton'
 import Image from 'next/image'
 import heroBg1 from '@/public/hero-bg.jpg'
@@ -14,11 +13,12 @@ import heroBg5 from '@/public/hero-bg-5.jpg'
 import heroBg6 from '@/public/hero-bg-6.jpg'
 import heroBg7 from '@/public/hero-bg-7.jpg'
 import { motion, AnimatePresence, type Variants } from 'framer-motion'
+import { useRouter } from 'next/navigation'
 
 export default function HeroSection() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const { companyData, isLoading } = useCompanyData()
-  const { openMessenger } = useMessenger()
+  const router = useRouter()
 
   const heroImages = [
     heroBg1,
@@ -37,8 +37,8 @@ export default function HeroSection() {
     return () => clearInterval(timer)
   }, [heroImages.length])
 
-  const handleMessenger = () => {
-    openMessenger()
+  const handleViewPackages = () => {
+    router.push('/packages')
   }
 
   const handleCall = () => {
@@ -233,11 +233,11 @@ export default function HeroSection() {
               variants={buttonVariants}
               whileHover='hover'
               whileTap='tap'
-              onClick={handleMessenger}
+              onClick={handleViewPackages}
               className='bg-[hsl(var(--primary))] text-primary-foreground px-8 py-4 rounded-xl hover:bg-[hsl(var(--primary))]/90 transition-all duration-300 flex items-center space-x-3 text-lg font-bold glow-hover'
             >
               <MessageCircle className='w-6 h-6' />
-              <span>Book Your Show - Messenger</span>
+              <span>View Packages</span>
             </motion.button>
 
             <motion.button

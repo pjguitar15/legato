@@ -22,8 +22,8 @@ export default function HomePage() {
       <PackagesSection />
       <EquipmentSection />
       <GallerySection />
-      <EventsSection />
       <TestimonialsSection />
+      <EventsSection />
       <AboutSection />
       <FAQSection />
       <ContactSection />

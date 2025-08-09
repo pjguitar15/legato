@@ -75,45 +75,30 @@ export async function PUT(
       expenses,
       location,
       mixerAndSpeaker,
+      driver,
       notes,
     } = body
 
-    // Validate required fields
-    if (
-      !eventType ||
-      !eventDate ||
-      !clientName ||
-      !agreedAmount ||
-      !packageName ||
-      !eventTime ||
-      !ingress ||
-      !location ||
-      !mixerAndSpeaker
-    ) {
-      return NextResponse.json(
-        { success: false, message: 'Missing required fields' },
-        { status: 400 },
-      )
-    }
-
+    // All fields are optional - no validation required
     const updatedBooking = await EventBooking.findByIdAndUpdate(
       id,
       {
-        status,
-        eventType,
-        eventDate: new Date(eventDate),
+        status: status || 'pending',
+        eventType: eventType || '',
+        eventDate: eventDate ? new Date(eventDate) : new Date(),
         crew: crew || [],
-        clientName,
-        agreedAmount: parseFloat(agreedAmount),
-        package: packageName,
-        eventTime,
-        ingress,
+        clientName: clientName || '',
+        agreedAmount: parseFloat(agreedAmount || 0),
+        package: packageName || '',
+        eventTime: eventTime || '',
+        ingress: ingress || '',
         expenses: parseFloat(expenses || 0),
-        location,
-        mixerAndSpeaker,
+        location: location || '',
+        mixerAndSpeaker: mixerAndSpeaker || '',
+        driver: driver || '',
         notes: notes || '',
       },
-      { new: true, runValidators: true },
+      { new: true, runValidators: false }, // Disable validators since fields are optional
     )
 
     if (!updatedBooking) {

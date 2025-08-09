@@ -18,8 +18,10 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
     const status = searchParams.get('status')
+    const hideCompleted = searchParams.get('hideCompleted') === 'true'
+    const hideCancelled = searchParams.get('hideCancelled') === 'true'
     const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '10')
+    const limit = parseInt(searchParams.get('limit') || '20') // Show 20 per page initially
     const skip = (page - 1) * limit
 
     // Build filter
@@ -28,12 +30,27 @@ export async function GET(request: NextRequest) {
       filter.status = status
     }
 
+    // Hide completed events if requested
+    if (hideCompleted) {
+      filter.status = { $ne: 'completed' }
+    }
+
+    // Hide cancelled events if requested
+    if (hideCancelled) {
+      filter.status = { $ne: 'cancelled' }
+    }
+
+    // Handle both hide completed and hide cancelled
+    if (hideCompleted && hideCancelled) {
+      filter.status = { $nin: ['completed', 'cancelled'] }
+    }
+
     // Get total count
     const total = await EventBooking.countDocuments(filter)
 
     // Get bookings with pagination
     const bookings = await EventBooking.find(filter)
-      .sort({ createdAt: -1, eventDate: 1 })
+      .sort({ eventDate: 1, createdAt: -1 })
       .skip(skip)
       .limit(limit)
       .lean()
@@ -46,6 +63,7 @@ export async function GET(request: NextRequest) {
         limit,
         total,
         pages: Math.ceil(total / limit),
+        hasMore: page * limit < total,
       },
     })
   } catch (error) {
@@ -84,40 +102,25 @@ export async function POST(request: NextRequest) {
       expenses,
       location,
       mixerAndSpeaker,
+      driver,
       notes,
     } = body
 
-    // Validate required fields
-    if (
-      !eventType ||
-      !eventDate ||
-      !clientName ||
-      !agreedAmount ||
-      !packageName ||
-      !eventTime ||
-      !ingress ||
-      !location ||
-      !mixerAndSpeaker
-    ) {
-      return NextResponse.json(
-        { success: false, message: 'Missing required fields' },
-        { status: 400 },
-      )
-    }
-
+    // All fields are optional - no validation required
     const booking = new EventBooking({
       status: status || 'pending',
-      eventType,
-      eventDate: new Date(eventDate),
+      eventType: eventType || '',
+      eventDate: eventDate ? new Date(eventDate) : new Date(),
       crew: crew || [],
-      clientName,
-      agreedAmount: parseFloat(agreedAmount),
-      package: packageName,
-      eventTime,
-      ingress,
+      clientName: clientName || '',
+      agreedAmount: parseFloat(agreedAmount || 0),
+      package: packageName || '',
+      eventTime: eventTime || '',
+      ingress: ingress || '',
       expenses: parseFloat(expenses || 0),
-      location,
-      mixerAndSpeaker,
+      location: location || '',
+      mixerAndSpeaker: mixerAndSpeaker || '',
+      driver: driver || '',
       notes: notes || '',
     })
 

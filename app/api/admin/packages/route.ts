@@ -75,6 +75,7 @@ export async function POST(request: NextRequest) {
       idealFor: body.idealFor,
       maxGuests: parseInt(body.maxGuests),
       popular: body.popular || false,
+      recommendedEvents: body.recommendedEvents || [],
     })
 
     await pkg.save()
