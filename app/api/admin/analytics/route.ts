@@ -86,7 +86,7 @@ export async function GET(request: NextRequest) {
     }, {} as Record<string, number>)
 
     const topClients = Object.entries(clientRevenue)
-      .sort(([, a], [, b]) => b - a)
+      .sort(([, a], [, b]) => (b as number) - (a as number))
       .slice(0, 10)
       .map(([client, revenue]) => ({ client, revenue }))
 
@@ -98,7 +98,7 @@ export async function GET(request: NextRequest) {
     }, {} as Record<string, number>)
 
     const topEventTypes = Object.entries(eventTypeStats)
-      .sort(([, a], [, b]) => b - a)
+      .sort(([, a], [, b]) => (b as number) - (a as number))
       .slice(0, 10)
       .map(([eventType, count]) => ({ eventType, count }))
 
@@ -110,7 +110,7 @@ export async function GET(request: NextRequest) {
     }, {} as Record<string, number>)
 
     const topCrew = Object.entries(crewStats)
-      .sort(([, a], [, b]) => b - a)
+      .sort(([, a], [, b]) => (b as number) - (a as number))
       .slice(0, 10)
       .map(([crew, count]) => ({ crew, count }))
 
@@ -122,7 +122,7 @@ export async function GET(request: NextRequest) {
     }, {} as Record<string, number>)
 
     const topDrivers = Object.entries(driverStats)
-      .sort(([, a], [, b]) => b - a)
+      .sort(([, a], [, b]) => (b as number) - (a as number))
       .slice(0, 10)
       .map(([driver, count]) => ({ driver, count }))
 

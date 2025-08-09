@@ -1001,9 +1001,7 @@ export default function EventBookingsPage() {
               />
               <Button
                 variant='outline'
-                onClick={() =>
-                  document.getElementById('file-import')?.click()
-                }
+                onClick={() => document.getElementById('file-import')?.click()}
                 size='sm'
                 disabled={isImporting}
                 className='bg-background border-border shadow-sm hover:bg-muted transition-all duration-200'
@@ -1027,240 +1025,235 @@ export default function EventBookingsPage() {
                   <Plus className='h-4 w-4' />
                 </Button>
               </DialogTrigger>
-                <DialogContent className='max-w-2xl max-h-[90vh] overflow-y-auto'>
-                  <DialogHeader>
-                    <DialogTitle>
-                      {editingBooking
-                        ? 'Edit Event Booking'
-                        : 'New Event Booking'}
-                    </DialogTitle>
-                  </DialogHeader>
-                  <form onSubmit={handleSubmit} className='space-y-4'>
-                    <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                      <div>
-                        <Label htmlFor='status'>Status</Label>
-                        <Select
-                          value={formData.status}
-                          onValueChange={(value) =>
-                            setFormData({
-                              ...formData,
-                              status: value as
-                                | 'pending'
-                                | 'confirmed'
-                                | 'completed'
-                                | 'cancelled',
-                            })
-                          }
-                        >
-                          <SelectTrigger className='bg-black'>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value='pending'>Pending</SelectItem>
-                            <SelectItem value='confirmed'>Confirmed</SelectItem>
-                            <SelectItem value='completed'>Completed</SelectItem>
-                            <SelectItem value='cancelled'>Cancelled</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div>
-                        <Label htmlFor='clientName'>Client Name</Label>
-                        <Combobox
-                          options={clients || []}
-                          value={formData.clientName}
-                          onValueChange={(value) =>
-                            setFormData({ ...formData, clientName: value })
-                          }
-                          onAddNewOption={addClient}
-                          placeholder='Select or add client...'
-                        />
-                      </div>
-
-                      <div>
-                        <Label htmlFor='eventType'>Event Type</Label>
-                        <Combobox
-                          options={eventTypes || []}
-                          value={formData.eventType}
-                          onValueChange={(value) =>
-                            setFormData({ ...formData, eventType: value })
-                          }
-                          onAddNewOption={addEventType}
-                          placeholder='Select or add event type...'
-                        />
-                      </div>
-
-                      <div>
-                        <Label htmlFor='eventDate'>Event Date</Label>
-                        <Input
-                          id='eventDate'
-                          type='date'
-                          value={formData.eventDate}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              eventDate: e.target.value,
-                            })
-                          }
-                        />
-                      </div>
-
-                      <div>
-                        <Label htmlFor='eventTime'>Event Time</Label>
-                        <Combobox
-                          options={timeOptions}
-                          value={formData.eventTime}
-                          onValueChange={(value) =>
-                            setFormData({ ...formData, eventTime: value })
-                          }
-                          onAddNewOption={addTimeOption}
-                          placeholder='Type time (e.g., 2PM, 3:30PM)...'
-                        />
-                      </div>
-
-                      <div>
-                        <Label htmlFor='ingress'>Ingress</Label>
-                        <Combobox
-                          options={timeOptions}
-                          value={formData.ingress}
-                          onValueChange={(value) =>
-                            setFormData({ ...formData, ingress: value })
-                          }
-                          onAddNewOption={addTimeOption}
-                          placeholder='Type time (e.g., 2PM, 3:30PM)...'
-                        />
-                      </div>
-
-                      <div>
-                        <Label htmlFor='location'>Location</Label>
-                        <Combobox
-                          options={locations || []}
-                          value={formData.location}
-                          onValueChange={(value) =>
-                            setFormData({ ...formData, location: value })
-                          }
-                          onAddNewOption={addLocation}
-                          placeholder='Select or add location...'
-                        />
-                      </div>
-
-                      <div>
-                        <Label htmlFor='package'>Package</Label>
-                        <Combobox
-                          options={packages || []}
-                          value={formData.package}
-                          onValueChange={(value) =>
-                            setFormData({ ...formData, package: value })
-                          }
-                          onAddNewOption={addPackage}
-                          placeholder='Select or add package...'
-                        />
-                      </div>
-
-                      <div>
-                        <Label htmlFor='agreedAmount'>Agreed Amount (₱)</Label>
-                        <Combobox
-                          options={amountOptions}
-                          value={formData.agreedAmount}
-                          onValueChange={(value) =>
-                            setFormData({
-                              ...formData,
-                              agreedAmount: value,
-                            })
-                          }
-                          onAddNewOption={addAmountOption}
-                          placeholder='Type amount (e.g., 5000, 7500)...'
-                        />
-                      </div>
-
-                      <div>
-                        <Label htmlFor='expenses'>Expenses (₱)</Label>
-                        <Combobox
-                          options={amountOptions}
-                          value={formData.expenses}
-                          onValueChange={(value) =>
-                            setFormData({ ...formData, expenses: value })
-                          }
-                          onAddNewOption={addAmountOption}
-                          placeholder='Type amount (e.g., 500, 1000)...'
-                        />
-                      </div>
-
-                      <div>
-                        <Label htmlFor='mixerAndSpeaker'>
-                          Mixer and Speaker
-                        </Label>
-                        <Combobox
-                          options={equipment || []}
-                          value={formData.mixerAndSpeaker}
-                          onValueChange={(value) =>
-                            setFormData({
-                              ...formData,
-                              mixerAndSpeaker: value,
-                            })
-                          }
-                          onAddNewOption={addEquipment}
-                          placeholder='Select or add equipment...'
-                        />
-                      </div>
-
-                      <div>
-                        <Label htmlFor='driver'>Driver</Label>
-                        <Combobox
-                          options={drivers || []}
-                          value={formData.driver}
-                          onValueChange={(value) =>
-                            setFormData({ ...formData, driver: value })
-                          }
-                          onAddNewOption={addDriver}
-                          placeholder='Select or add driver...'
-                        />
-                      </div>
-
-                      <div className='md:col-span-2'>
-                        <Label htmlFor='crew'>Crew Members</Label>
-                        <TagInput
-                          value={formData.crew}
-                          onChange={(crew) =>
-                            setFormData({ ...formData, crew })
-                          }
-                          placeholder='Add crew members...'
-                        />
-                      </div>
-
-                      <div className='md:col-span-2'>
-                        <Label htmlFor='notes'>Notes</Label>
-                        <Textarea
-                          id='notes'
-                          value={formData.notes}
-                          onChange={(e) =>
-                            setFormData({ ...formData, notes: e.target.value })
-                          }
-                          placeholder='Additional notes...'
-                          rows={3}
-                        />
-                      </div>
-                    </div>
-
-                    <div className='flex justify-end space-x-2 pt-4'>
-                      <Button
-                        type='button'
-                        variant='outline'
-                        onClick={() => setIsDialogOpen(false)}
+              <DialogContent className='max-w-2xl max-h-[90vh] overflow-y-auto'>
+                <DialogHeader>
+                  <DialogTitle>
+                    {editingBooking
+                      ? 'Edit Event Booking'
+                      : 'New Event Booking'}
+                  </DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleSubmit} className='space-y-4'>
+                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                    <div>
+                      <Label htmlFor='status'>Status</Label>
+                      <Select
+                        value={formData.status}
+                        onValueChange={(value) =>
+                          setFormData({
+                            ...formData,
+                            status: value as
+                              | 'pending'
+                              | 'confirmed'
+                              | 'completed'
+                              | 'cancelled',
+                          })
+                        }
                       >
-                        Cancel
-                      </Button>
-                      <Button type='submit'>
-                        {editingBooking ? 'Update Booking' : 'Create Booking'}
-                      </Button>
+                        <SelectTrigger className='bg-black'>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value='pending'>Pending</SelectItem>
+                          <SelectItem value='confirmed'>Confirmed</SelectItem>
+                          <SelectItem value='completed'>Completed</SelectItem>
+                          <SelectItem value='cancelled'>Cancelled</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
-                  </form>
-                </DialogContent>
-              </Dialog>
-            </div>
+
+                    <div>
+                      <Label htmlFor='clientName'>Client Name</Label>
+                      <Combobox
+                        options={clients || []}
+                        value={formData.clientName}
+                        onValueChange={(value) =>
+                          setFormData({ ...formData, clientName: value })
+                        }
+                        onAddNewOption={addClient}
+                        placeholder='Select or add client...'
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor='eventType'>Event Type</Label>
+                      <Combobox
+                        options={eventTypes || []}
+                        value={formData.eventType}
+                        onValueChange={(value) =>
+                          setFormData({ ...formData, eventType: value })
+                        }
+                        onAddNewOption={addEventType}
+                        placeholder='Select or add event type...'
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor='eventDate'>Event Date</Label>
+                      <Input
+                        id='eventDate'
+                        type='date'
+                        value={formData.eventDate}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            eventDate: e.target.value,
+                          })
+                        }
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor='eventTime'>Event Time</Label>
+                      <Combobox
+                        options={timeOptions}
+                        value={formData.eventTime}
+                        onValueChange={(value) =>
+                          setFormData({ ...formData, eventTime: value })
+                        }
+                        onAddNewOption={addTimeOption}
+                        placeholder='Type time (e.g., 2PM, 3:30PM)...'
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor='ingress'>Ingress</Label>
+                      <Combobox
+                        options={timeOptions}
+                        value={formData.ingress}
+                        onValueChange={(value) =>
+                          setFormData({ ...formData, ingress: value })
+                        }
+                        onAddNewOption={addTimeOption}
+                        placeholder='Type time (e.g., 2PM, 3:30PM)...'
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor='location'>Location</Label>
+                      <Combobox
+                        options={locations || []}
+                        value={formData.location}
+                        onValueChange={(value) =>
+                          setFormData({ ...formData, location: value })
+                        }
+                        onAddNewOption={addLocation}
+                        placeholder='Select or add location...'
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor='package'>Package</Label>
+                      <Combobox
+                        options={packages || []}
+                        value={formData.package}
+                        onValueChange={(value) =>
+                          setFormData({ ...formData, package: value })
+                        }
+                        onAddNewOption={addPackage}
+                        placeholder='Select or add package...'
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor='agreedAmount'>Agreed Amount (₱)</Label>
+                      <Combobox
+                        options={amountOptions}
+                        value={formData.agreedAmount}
+                        onValueChange={(value) =>
+                          setFormData({
+                            ...formData,
+                            agreedAmount: value,
+                          })
+                        }
+                        onAddNewOption={addAmountOption}
+                        placeholder='Type amount (e.g., 5000, 7500)...'
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor='expenses'>Expenses (₱)</Label>
+                      <Combobox
+                        options={amountOptions}
+                        value={formData.expenses}
+                        onValueChange={(value) =>
+                          setFormData({ ...formData, expenses: value })
+                        }
+                        onAddNewOption={addAmountOption}
+                        placeholder='Type amount (e.g., 500, 1000)...'
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor='mixerAndSpeaker'>Mixer and Speaker</Label>
+                      <Combobox
+                        options={equipment || []}
+                        value={formData.mixerAndSpeaker}
+                        onValueChange={(value) =>
+                          setFormData({
+                            ...formData,
+                            mixerAndSpeaker: value,
+                          })
+                        }
+                        onAddNewOption={addEquipment}
+                        placeholder='Select or add equipment...'
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor='driver'>Driver</Label>
+                      <Combobox
+                        options={drivers || []}
+                        value={formData.driver}
+                        onValueChange={(value) =>
+                          setFormData({ ...formData, driver: value })
+                        }
+                        onAddNewOption={addDriver}
+                        placeholder='Select or add driver...'
+                      />
+                    </div>
+
+                    <div className='md:col-span-2'>
+                      <Label htmlFor='crew'>Crew Members</Label>
+                      <TagInput
+                        value={formData.crew}
+                        onChange={(crew) => setFormData({ ...formData, crew })}
+                        placeholder='Add crew members...'
+                      />
+                    </div>
+
+                    <div className='md:col-span-2'>
+                      <Label htmlFor='notes'>Notes</Label>
+                      <Textarea
+                        id='notes'
+                        value={formData.notes}
+                        onChange={(e) =>
+                          setFormData({ ...formData, notes: e.target.value })
+                        }
+                        placeholder='Additional notes...'
+                        rows={3}
+                      />
+                    </div>
+                  </div>
+
+                  <div className='flex justify-end space-x-2 pt-4'>
+                    <Button
+                      type='button'
+                      variant='outline'
+                      onClick={() => setIsDialogOpen(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button type='submit'>
+                      {editingBooking ? 'Update Booking' : 'Create Booking'}
+                    </Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
           </div>
 
-        {/* Bookings Display */}
+          {/* Bookings Display */}
           {viewMode === 'grid' ? (
             <div className='grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6'>
               {filteredBookings.map((booking) => (
@@ -1541,7 +1534,7 @@ export default function EventBookingsPage() {
           )}
         </TabsContent>
 
-      <TabsContent value='analytics' className='space-y-6'>
+        <TabsContent value='analytics' className='space-y-6'>
           {isAnalyticsLoading ? (
             <div className='text-center py-12'>
               <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4'></div>

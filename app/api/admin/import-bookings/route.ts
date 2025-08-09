@@ -339,7 +339,12 @@ export async function POST(request: NextRequest) {
         }
 
         // Check for existing booking to avoid duplicates
-        const duplicateCriteria = {
+        type DuplicateCriteria = {
+          clientName: string
+          eventDate: Date
+          eventType?: string
+        }
+        const duplicateCriteria: DuplicateCriteria = {
           clientName: parsedBooking.clientName,
           eventDate: parsedBooking.eventDate,
         }
