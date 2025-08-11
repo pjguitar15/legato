@@ -37,10 +37,17 @@ export async function PUT(
     const { id } = await params
     const body = await request.json()
 
-    const pkg = await Package.findByIdAndUpdate(id, body, {
-      new: true,
-      runValidators: true,
-    })
+    const pkg = await Package.findByIdAndUpdate(
+      id,
+      {
+        ...body,
+        image: body.image ?? '',
+      },
+      {
+        new: true,
+        runValidators: true,
+      },
+    )
 
     if (!pkg) {
       return NextResponse.json(

@@ -18,6 +18,7 @@ type Pkg = {
   maxGuests: number
   popular: boolean
   recommendedEvents?: string[]
+  image?: string
 }
 
 export default function PackagesPage() {
@@ -63,44 +64,44 @@ export default function PackagesPage() {
               }
               animate={{ scale: hoveredId === pkg._id ? 1.01 : 1 }}
               transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-              className='relative w-full cursor-pointer overflow-hidden rounded-2xl border border-border bg-card shadow-sm'
+              className='relative w-full cursor-pointer overflow-hidden rounded-2xl border border-border bg-card shadow-sm group'
             >
-              {/* Background image and decorative PNGs */}
+              {/* Background image */}
               <div className='relative h-64 sm:h-80 w-full'>
                 <Image
-                  src={'/placeholder.svg'}
+                  src={
+                    pkg.image && pkg.image.length > 0
+                      ? pkg.image
+                      : '/placeholder.jpg'
+                  }
                   alt={`${pkg.name} preview`}
                   fill
                   className='object-cover'
                 />
-                {/* animated PNG accents */}
-                <motion.img
-                  src='/rcf.webp'
-                  alt=''
-                  aria-hidden
-                  className='absolute -left-6 bottom-4 h-20 w-20 object-contain drop-shadow-xl'
-                  initial={{ rotate: -8, opacity: 0 }}
-                  animate={{
-                    rotate: hoveredId === pkg._id ? 0 : -8,
-                    opacity: 0.85,
-                  }}
-                  transition={{ type: 'spring', stiffness: 200, damping: 18 }}
-                />
-                <motion.img
-                  src='/window.svg'
-                  alt=''
-                  aria-hidden
-                  className='absolute right-6 -top-4 h-16 w-16 object-contain opacity-80'
-                  initial={{ y: -10, opacity: 0 }}
-                  animate={{ y: hoveredId === pkg._id ? 0 : -10, opacity: 1 }}
-                  transition={{ duration: 0.4 }}
-                />
                 {/* darken rest on hover */}
                 <motion.div
-                  className='absolute inset-0 bg-black/40'
+                  className='absolute inset-0 bg-black/60'
                   initial={{ opacity: 0 }}
                   animate={{ opacity: hoveredId === pkg._id ? 1 : 0 }}
                 />
+                {/* Netflixy hover info */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{
+                    opacity: hoveredId === pkg._id ? 1 : 0,
+                    y: hoveredId === pkg._id ? 0 : 20,
+                  }}
+                  className='absolute inset-0 flex items-end p-6 text-white'
+                >
+                  <div>
+                    <div className='text-2xl font-extrabold drop-shadow'>
+                      {pkg.name}
+                    </div>
+                    <div className='mt-2 text-sm opacity-90 line-clamp-2'>
+                      {pkg.description}
+                    </div>
+                  </div>
+                </motion.div>
               </div>
 
               {/* Content row */}
@@ -145,13 +146,13 @@ export default function PackagesPage() {
                   <div className='mt-5 flex gap-3'>
                     <Link
                       href={`/packages/${pkg._id}`}
-                      className='rounded-lg bg-[hsl(var(--primary))] px-6 py-3 font-semibold text-primary-foreground transition hover:bg-[hsl(var(--primary))]/90'
+                      className='rounded-lg bg-[hsl(var(--primary))] px-6 py-3 font-semibold text-primary-foreground transition hover:bg-[hsl(var(--primary))]/90 inline-block ring-2 ring-transparent group-hover:ring-[hsl(var(--primary))]'
                     >
                       Book this package
                     </Link>
                     <Link
                       href={`/packages/${pkg._id}`}
-                      className='rounded-lg border px-6 py-3 font-semibold hover:border-primary hover:text-primary'
+                      className='rounded-lg border px-6 py-3 font-semibold hover:border-primary hover:text-primary ring-2 ring-transparent group-hover:ring-primary'
                     >
                       View events
                     </Link>

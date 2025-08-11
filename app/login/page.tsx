@@ -2,7 +2,9 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Music, Lock, User } from 'lucide-react'
+import { Lock, User } from 'lucide-react'
+import Image from 'next/image'
+import whiteLogo from '@/public/Legato Landscape.png'
 
 export default function LoginPage() {
   const [credentials, setCredentials] = useState({ username: '', password: '' })
@@ -46,8 +48,13 @@ export default function LoginPage() {
       <div className='max-w-md w-full'>
         {/* Logo and Title */}
         <div className='text-center mb-8'>
-          <div className='inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl mb-4'>
-            <Music className='w-8 h-8 text-white' />
+          <div className='flex items-center justify-center mb-4'>
+            <Image
+              src={whiteLogo}
+              alt='Legato Sounds and Lights'
+              className='h-10 w-auto'
+              priority
+            />
           </div>
           <h1 className='text-3xl font-display font-bold mb-2'>Admin Login</h1>
           <p className='text-muted-foreground'>Access the Legato admin panel</p>

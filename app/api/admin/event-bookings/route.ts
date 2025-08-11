@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     const hideCompleted = searchParams.get('hideCompleted') === 'true'
     const hideCancelled = searchParams.get('hideCancelled') === 'true'
     const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '20') // Show 20 per page initially
+    const limit = parseInt(searchParams.get('limit') || '50') // Load 50 per page for faster catch-up
     const skip = (page - 1) * limit
 
     // Build filter
@@ -50,7 +50,8 @@ export async function GET(request: NextRequest) {
 
     // Get bookings with pagination
     const bookings = await EventBooking.find(filter)
-      .sort({ eventDate: 1, createdAt: -1 })
+      // newest first so oldest ends at the end in UI when asc is chosen
+      .sort({ eventDate: -1, createdAt: -1 })
       .skip(skip)
       .limit(limit)
       .lean()
@@ -135,6 +136,35 @@ export async function POST(request: NextRequest) {
     console.error('Error creating event booking:', error)
     return NextResponse.json(
       { success: false, message: 'Failed to create event booking' },
+      { status: 500 },
+    )
+  }
+}
+
+// DELETE - Remove all event bookings (admin only)
+export async function DELETE(request: NextRequest) {
+  try {
+    const authResult = await verifyAuthRequest(request)
+    if (!authResult) {
+      return NextResponse.json(
+        { success: false, message: 'Unauthorized' },
+        { status: 401 },
+      )
+    }
+
+    await connectToDatabase()
+
+    const result = await EventBooking.deleteMany({})
+
+    return NextResponse.json({
+      success: true,
+      message: `Deleted ${result.deletedCount || 0} event bookings`,
+      deletedCount: result.deletedCount || 0,
+    })
+  } catch (error) {
+    console.error('Error deleting event bookings:', error)
+    return NextResponse.json(
+      { success: false, message: 'Failed to delete event bookings' },
       { status: 500 },
     )
   }

@@ -9,6 +9,7 @@ import Equipment from '@/models/Equipment'
 import Event from '@/models/Event'
 import Gallery from '@/models/Gallery'
 import Testimonial from '@/models/Testimonial'
+import Vlog from '@/models/Vlog'
 
 export async function POST() {
   console.log('🚀 Init-data route called')
@@ -231,6 +232,12 @@ export async function POST() {
     console.log('🎵 Existing Equipment count:', existingEquipment.length)
     if (existingEquipment.length === 0) {
       console.log('🎵 Creating sample Equipment data...')
+      const unsplash = (q: string) =>
+        `https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=800&q=60&sig=${Math.floor(
+          Math.random() * 10000,
+        )}&${q}`
+      const picsum = () => `https://picsum.photos/seed/${Math.random()}/800/600`
+
       const equipmentData = [
         {
           name: 'Audio Equipment',
@@ -273,6 +280,22 @@ export async function POST() {
               ],
               brand: 'Shure',
             },
+            {
+              name: 'QSC KW181 Subwoofer',
+              type: 'Subwoofer',
+              description: '18" powered subwoofer for deep low-end',
+              image: picsum(),
+              features: ['1000W Class-D', 'Deep Bass', 'Rugged Build'],
+              brand: 'QSC',
+            },
+            {
+              name: 'Sennheiser e935',
+              type: 'Dynamic Microphone',
+              description: 'Vocal mic with clear presence and definition',
+              image: unsplash('mic'),
+              features: ['Cardioid', 'Feedback Rejection', 'Durable'],
+              brand: 'Sennheiser',
+            },
           ],
         },
         {
@@ -289,6 +312,22 @@ export async function POST() {
                 'Professional Hardware',
               ],
               brand: 'Pearl',
+            },
+            {
+              name: 'Fender Jazz Bass',
+              type: 'Bass Guitar',
+              description: 'Classic 4-string bass with rich tone',
+              image: unsplash('bass'),
+              features: ['Alder Body', 'Maple Neck', 'Versatile'],
+              brand: 'Fender',
+            },
+            {
+              name: 'Marshall DSL40C',
+              type: 'Guitar Amplifier',
+              description: '40W tube combo amp with classic crunch',
+              image: picsum(),
+              features: ['2 Channels', 'Reverb', 'Classic Marshall Tone'],
+              brand: 'Marshall',
             },
           ],
         },
@@ -315,6 +354,43 @@ export async function POST() {
                 'Compact Design',
               ],
               brand: 'ADJ',
+            },
+            {
+              name: 'Fog Machine',
+              type: 'Atmosphere',
+              description: 'Creates atmospheric haze/fog effects',
+              image: picsum(),
+              features: ['Fast Warm-up', 'Remote Control', 'Compact'],
+              brand: 'ADJ',
+            },
+            {
+              name: 'LED Pixel Bar',
+              type: 'Effect Lighting',
+              description: 'Chase effects and pixel mapping for stages',
+              image: unsplash('led lighting'),
+              features: ['RGB', 'DMX Control', 'Low Power'],
+              brand: 'Chauvet',
+            },
+          ],
+        },
+        {
+          name: 'Backline',
+          items: [
+            {
+              name: 'DW 9000 Kick Pedal',
+              type: 'Drum Hardware',
+              description: 'Smooth and responsive double-chain pedal',
+              image: picsum(),
+              features: ['Adjustable Cam', 'Dual-chain', 'Carry Case'],
+              brand: 'DW',
+            },
+            {
+              name: 'Korg Kronos 61',
+              type: 'Keyboard',
+              description: 'Workstation synth for live and studio',
+              image: unsplash('keyboard'),
+              features: ['Multiple Engines', 'Touchscreen', 'Aftertouch'],
+              brand: 'Korg',
             },
           ],
         },
@@ -428,6 +504,28 @@ export async function POST() {
       console.log('✓ Packages data initialized')
     } else {
       console.log('ℹ️  Packages data already exists, skipping...')
+    }
+
+    // Initialize Vlogs (YouTube links)
+    console.log('🔍 Checking for existing Vlogs data...')
+    const existingVlogs = await Vlog.find()
+    if (existingVlogs.length === 0) {
+      const youtubeUrls = [
+        'https://www.youtube.com/watch?v=tgD2soayoRE',
+        'https://www.youtube.com/watch?v=C7Bib3B5yNs',
+        'https://www.youtube.com/watch?v=TL1hv4GoIfo',
+        'https://www.youtube.com/watch?v=89BcqVpeaXQ&t=8s',
+        'https://www.youtube.com/watch?v=yWw6qzXrDRw&t=219s',
+        'https://www.youtube.com/watch?v=8trNMKgUbns&t=113s',
+      ]
+      const toId = (u: string) =>
+        (u.match(/v=([^&]+)/)?.[1] || '').replace(/\s/g, '')
+      await Vlog.insertMany(
+        youtubeUrls.map((url) => ({ url, youtubeId: toId(url) })),
+      )
+      console.log('✓ Vlogs data initialized')
+    } else {
+      console.log('ℹ️  Vlogs already exist, skipping...')
     }
 
     // Initialize Recent Events mapped to packages

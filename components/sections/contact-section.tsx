@@ -1,6 +1,13 @@
 'use client'
 
-import { Phone, MessageCircle, Mail, MapPin, Clock, Star } from 'lucide-react'
+import {
+  ExternalLink,
+  MessageCircle,
+  Mail,
+  MapPin,
+  Clock,
+  Star,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { useCompanyData } from '@/hooks/use-company-data'
@@ -15,10 +22,12 @@ export default function ContactSection() {
     openMessenger()
   }
 
-  const handleCall = () => {
-    if (companyData?.contact?.phone) {
-      window.open(`tel:${companyData.contact.phone}`, '_self')
-    }
+  const handleOpenFacebook = () => {
+    const fb =
+      (companyData as any)?.socialMedia?.facebook ||
+      (companyData as any)?.contact?.facebook ||
+      (companyData as any)?.contact?.messenger
+    if (fb) window.open(fb, '_blank')
   }
 
   const handleEmail = () => {
@@ -87,53 +96,25 @@ export default function ContactSection() {
                 Get in Touch
               </h3>
               <div className='space-y-4'>
-                {/* Messenger */}
+                {/* Facebook Page */}
                 <Card
                   className='border-primary/20 hover:border-primary/50 transition-colors cursor-pointer'
-                  onClick={handleMessenger}
+                  onClick={handleOpenFacebook}
                 >
                   <CardContent className='p-6'>
                     <div className='flex items-center space-x-4'>
-                      <div className='bg-blue-500 p-3 rounded-full'>
-                        <MessageCircle className='w-6 h-6 text-white' />
+                      <div className='bg-blue-600 p-3 rounded-full'>
+                        <ExternalLink className='w-6 h-6 text-white' />
                       </div>
                       <div>
-                        <h4 className='font-semibold'>
-                          Facebook Messenger (Recommended)
-                        </h4>
-                        <p className='text-muted-foreground'>
-                          m.me/legatosounds
-                        </p>
-                        <p className='text-sm text-blue-600'>
-                          Instant quotes & fast response!
-                        </p>
+                        <h4 className='font-semibold'>Facebook Page</h4>
+                        <p className='text-muted-foreground'>Visit our page</p>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
 
-                {/* Phone */}
-                <Card
-                  className='border-border hover:border-primary/50 transition-colors cursor-pointer'
-                  onClick={handleCall}
-                >
-                  <CardContent className='p-6'>
-                    <div className='flex items-center space-x-4'>
-                      <div className='bg-blue-500 p-3 rounded-full'>
-                        <Phone className='w-6 h-6 text-white' />
-                      </div>
-                      <div>
-                        <h4 className='font-semibold'>Phone</h4>
-                        <p className='text-muted-foreground'>
-                          {companyData.contact.phone}
-                        </p>
-                        <p className='text-sm text-muted-foreground'>
-                          Call for immediate assistance
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                {/* Phone removed per request */}
 
                 {/* Email */}
                 <Card
@@ -158,26 +139,7 @@ export default function ContactSection() {
                   </CardContent>
                 </Card>
 
-                {/* Facebook Messenger */}
-                <Card
-                  className='border-border hover:border-primary/50 transition-colors cursor-pointer'
-                  onClick={handleMessenger}
-                >
-                  <CardContent className='p-6'>
-                    <div className='flex items-center space-x-4'>
-                      <div className='bg-blue-600 p-3 rounded-full'>
-                        <MessageCircle className='w-6 h-6 text-white' />
-                      </div>
-                      <div>
-                        <h4 className='font-semibold'>Facebook Messenger</h4>
-                        <p className='text-muted-foreground'>Chat with us</p>
-                        <p className='text-sm text-muted-foreground'>
-                          Instant messaging support
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                {/* Extra Messenger card removed */}
               </div>
             </div>
 
@@ -275,19 +237,11 @@ export default function ContactSection() {
             {/* CTA Buttons */}
             <div className='space-y-4'>
               <Button
-                onClick={handleMessenger}
+                onClick={() => (window.location.href = '/packages')}
                 className='w-full bg-[hsl(var(--primary))] text-primary-foreground hover:bg-[hsl(var(--primary))]/90 text-lg py-6'
               >
                 <MessageCircle className='w-5 h-5 mr-2' />
-                Get Instant Quote via Messenger
-              </Button>
-              <Button
-                onClick={handleCall}
-                variant='outline'
-                className='w-full text-lg py-6'
-              >
-                <Phone className='w-5 h-5 mr-2' />
-                Call for Immediate Booking
+                View Packages
               </Button>
             </div>
           </div>

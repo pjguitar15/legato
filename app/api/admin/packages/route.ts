@@ -71,10 +71,11 @@ export async function POST(request: NextRequest) {
       price: parseFloat(body.price),
       currency: body.currency || '₱',
       features: body.features || [],
-      equipment: body.equipment || [],
+      equipment: Array.isArray(body.equipment) ? body.equipment : [],
       idealFor: body.idealFor,
       maxGuests: parseInt(body.maxGuests),
       popular: body.popular || false,
+      image: body.image || '',
       recommendedEvents: body.recommendedEvents || [],
     })
 

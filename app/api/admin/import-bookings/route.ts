@@ -181,9 +181,9 @@ export async function POST(request: NextRequest) {
     const headers = parsedLines[0].map((h) => h.trim().toLowerCase())
     console.log('CSV Headers:', headers)
 
-    const importedBookings = []
-    const errors = []
-    const skippedDuplicates = []
+    const importedBookings: any[] = []
+    const errors: any[] = []
+    const skippedDuplicates: any[] = []
 
     // Process data rows (skip header)
     for (let i = 1; i < parsedLines.length; i++) {
@@ -204,11 +204,9 @@ export async function POST(request: NextRequest) {
 
           switch (header) {
             case 'name':
-              // This IS the client name! (not an internal identifier)
-              bookingData.clientName = value
-              console.log(
-                `    → Mapped clientName from Name column: "${value}"`,
-              )
+              // fallback name if client name column is empty
+              bookingData.fallbackName = value
+              console.log(`    → Captured fallback Name column: "${value}"`)
               break
             case 'status':
               // Handle multiple statuses and prioritize "Done"
@@ -241,14 +239,14 @@ export async function POST(request: NextRequest) {
               console.log(`    → Status mapping: "${value}" → "${finalStatus}"`)
               break
             case 'package':
-              bookingData.package = value
+              bookingData.package = value || 'Undefined Package'
               break
             case 'event date':
             case 'eventdate':
               bookingData.eventDate = value
               break
             case 'location':
-              bookingData.location = value
+              bookingData.location = value || 'N/A'
               break
             case 'agreed amount':
             case 'agreedamount':
@@ -263,10 +261,7 @@ export async function POST(request: NextRequest) {
               break
             case 'client name':
             case 'clientname':
-              // Skip this column since we're using the "Name" column for client names
-              console.log(
-                `    → Skipped Client Name column: "${value}" (using Name column instead)`,
-              )
+              bookingData.clientName = value
               break
             case 'ingress':
               bookingData.ingress = value
@@ -315,7 +310,10 @@ export async function POST(request: NextRequest) {
           continue
         }
 
-        // No need for auto-fill since we're getting client name from the Name column
+        // Ensure client name exists: prefer explicit clientName, else fallback to Name
+        if (!bookingData.clientName || bookingData.clientName.trim() === '') {
+          bookingData.clientName = bookingData.fallbackName || ''
+        }
 
         // Parse and validate the booking data
         const parsedDate = parseDate(bookingData.eventDate)
@@ -328,47 +326,17 @@ export async function POST(request: NextRequest) {
             : [],
           clientName: bookingData.clientName || '',
           agreedAmount: parseFloat(bookingData.agreedAmount) || 0,
-          package: bookingData.package || '',
+          package: bookingData.package || 'Undefined Package',
           eventTime: bookingData.eventTime || '',
           ingress: bookingData.ingress || '',
           expenses: parseFloat(bookingData.expenses) || 0,
-          location: bookingData.location || '',
+          location: bookingData.location || 'N/A',
           mixerAndSpeaker: bookingData.mixerAndSpeaker || '',
           driver: bookingData.driver || '',
           notes: bookingData.notes || `Imported from CSV - Row ${i + 1}`,
         }
 
-        // Check for existing booking to avoid duplicates
-        type DuplicateCriteria = {
-          clientName: string
-          eventDate: Date
-          eventType?: string
-        }
-        const duplicateCriteria: DuplicateCriteria = {
-          clientName: parsedBooking.clientName,
-          eventDate: parsedBooking.eventDate,
-        }
-
-        // Add eventType to criteria if it exists
-        if (parsedBooking.eventType) {
-          duplicateCriteria.eventType = parsedBooking.eventType
-        }
-
-        const existingBooking = await EventBooking.findOne(duplicateCriteria)
-
-        if (existingBooking) {
-          const duplicateInfo = {
-            row: i + 1,
-            clientName: parsedBooking.clientName,
-            eventDate: parsedBooking.eventDate,
-            existingId: existingBooking._id,
-          }
-          skippedDuplicates.push(duplicateInfo)
-          console.log(
-            `⚠ SKIPPED: Duplicate booking found - "${parsedBooking.clientName}" on ${parsedBooking.eventDate} (ID: ${existingBooking._id})`,
-          )
-          continue // Skip this row
-        }
+        // Duplicates are allowed per latest requirement; do not skip on duplicates
 
         // Create the booking
         const newBooking = new EventBooking(parsedBooking)

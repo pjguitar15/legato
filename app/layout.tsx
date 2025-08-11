@@ -1,6 +1,7 @@
 import type React from 'react'
 import type { Metadata } from 'next'
-import { Poppins, Montserrat } from 'next/font/google'
+import { Poppins, Montserrat, League_Spartan } from 'next/font/google'
+import localFont from 'next/font/local'
 import './globals.css'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster as SonnerToaster } from '@/components/ui/sonner'
@@ -15,6 +16,20 @@ const montserrat = Montserrat({
   subsets: ['latin'],
   variable: '--font-montserrat',
   weight: ['300', '400', '500', '600', '700', '800', '900'],
+})
+
+const leagueSpartan = League_Spartan({
+  subsets: ['latin'],
+  variable: '--font-league-spartan',
+  weight: ['400', '500', '600', '700', '800', '900'],
+})
+
+// Locally provided heading font placed at public/fonts/varelmo/Varelmo.ttf
+const heroFont = localFont({
+  src: '../public/fonts/varelmo/Varelmo.ttf',
+  variable: '--font-hero',
+  display: 'swap',
+  weight: '400',
 })
 
 export const metadata: Metadata = {
@@ -67,14 +82,14 @@ export default function RootLayout({
   return (
     <html
       lang='en'
-      className={`${poppins.variable} ${montserrat.variable}`}
+      className={`${poppins.variable} ${montserrat.variable} ${leagueSpartan.variable} ${heroFont.variable}`}
       suppressHydrationWarning
     >
       <body className='transition-colors duration-300' suppressHydrationWarning>
         <ThemeProvider
           attribute='class'
-          defaultTheme='system'
-          enableSystem={true}
+          defaultTheme='dark'
+          enableSystem={false}
           disableTransitionOnChange={false}
           storageKey='legato-theme'
         >

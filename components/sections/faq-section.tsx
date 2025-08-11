@@ -50,7 +50,10 @@ export default function FAQSection() {
         <div className='max-w-4xl mx-auto px-4 sm:px-6 lg:px-8'>
           <div className='text-center mb-16'>
             <h2 className='text-4xl sm:text-5xl font-display font-bold mb-6'>
-              Frequently Asked <span className='text-gradient'>Questions</span>
+              Frequently Asked{' '}
+              <span className='bg-gradient-to-r from-emerald-400 to-sky-400 bg-clip-text text-transparent'>
+                Questions
+              </span>
             </h2>
             <p className='text-xl text-muted-foreground max-w-3xl mx-auto'>
               Everything you need to know about our sound and lighting services.
@@ -60,7 +63,10 @@ export default function FAQSection() {
           {/* Loading Skeleton */}
           <div className='text-center mb-16'>
             <h2 className='text-4xl sm:text-5xl font-display font-bold mb-6'>
-              Frequently Asked <span className='text-gradient'>Questions</span>
+              Frequently Asked{' '}
+              <span className='bg-gradient-to-r from-emerald-400 to-sky-400 bg-clip-text text-transparent'>
+                Questions
+              </span>
             </h2>
             <SkeletonText lines={2} className='max-w-3xl mx-auto' />
           </div>
@@ -105,7 +111,10 @@ export default function FAQSection() {
         {/* Section Header */}
         <div className='text-center mb-16'>
           <h2 className='text-4xl sm:text-5xl font-display font-bold mb-6'>
-            Frequently Asked <span className='text-gradient'>Questions</span>
+            Frequently Asked{' '}
+            <span className='bg-gradient-to-r from-emerald-400 to-sky-400 bg-clip-text text-transparent'>
+              Questions
+            </span>
           </h2>
           <p className='text-xl text-muted-foreground max-w-3xl mx-auto'>
             Everything you need to know about our sound and lighting services.

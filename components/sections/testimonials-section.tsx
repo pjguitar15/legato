@@ -66,7 +66,10 @@ export default function TestimonialsSection() {
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
           <div className='text-center mb-16'>
             <h2 className='text-4xl sm:text-5xl font-display font-bold mb-6'>
-              What Our <span className='text-gradient'>Clients Say</span>
+              What Our{' '}
+              <span className='bg-gradient-to-r from-emerald-400 to-sky-400 bg-clip-text text-transparent'>
+                Clients Say
+              </span>
             </h2>
             <p className='text-xl text-muted-foreground max-w-3xl mx-auto'>
               Don't just take our word for it. Here's what our clients have to
@@ -91,7 +94,10 @@ export default function TestimonialsSection() {
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
           <div className='text-center mb-16'>
             <h2 className='text-4xl sm:text-5xl font-display font-bold mb-6'>
-              What Our <span className='text-gradient'>Clients Say</span>
+              What Our{' '}
+              <span className='bg-gradient-to-r from-emerald-400 to-sky-400 bg-clip-text text-transparent'>
+                Clients Say
+              </span>
             </h2>
             <p className='text-xl text-muted-foreground max-w-3xl mx-auto'>
               We're building our reputation one event at a time. Check back soon
@@ -111,7 +117,10 @@ export default function TestimonialsSection() {
         {/* Section Header */}
         <div className='text-center mb-16'>
           <h2 className='text-4xl sm:text-5xl font-display font-bold mb-6'>
-            What Our <span className='text-gradient'>Clients Say</span>
+            What Our{' '}
+            <span className='bg-gradient-to-r from-emerald-400 to-sky-400 bg-clip-text text-transparent'>
+              Clients Say
+            </span>
           </h2>
           <p className='text-xl text-muted-foreground max-w-3xl mx-auto'>
             Don't just take our word for it. Here's what our clients have to say

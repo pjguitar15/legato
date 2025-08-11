@@ -76,6 +76,14 @@ ChartJS.register(
   LineElement,
 )
 
+// Consistent chart colors per booking status
+const chartStatusColor: Record<string, string> = {
+  completed: '#10b981', // green
+  pending: '#fbbf24', // yellow
+  confirmed: '#3b82f6', // blue
+  cancelled: '#ef4444', // red
+}
+
 interface EventBooking {
   _id: string
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled'
@@ -140,11 +148,12 @@ export default function EventBookingsPage() {
   )
   const [filterStatus, setFilterStatus] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
-  const [hideCompleted, setHideCompleted] = useState(true)
-  const [hideCancelled, setHideCancelled] = useState(true)
+  // Show ALL by default; user can hide via toggles
+  const [hideCompleted, setHideCompleted] = useState(false)
+  const [hideCancelled, setHideCancelled] = useState(false)
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid')
   const [sortBy, setSortBy] = useState<string>('eventDate')
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null)
   const [isAnalyticsLoading, setIsAnalyticsLoading] = useState(false)
   const [isImporting, setIsImporting] = useState(false)
@@ -773,11 +782,18 @@ export default function EventBookingsPage() {
   useEffect(() => {
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 300)
+      const nearBottom =
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 200
+      if (nearBottom && hasMore && !isLoadingMore && !isLoading) {
+        loadMore()
+      }
     }
 
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasMore, isLoadingMore, isLoading, currentPage])
 
   // Filter and sort bookings
   const filteredBookings = bookings
@@ -1628,12 +1644,13 @@ export default function EventBookingsPage() {
                                 analyticsData.statusDistribution?.map(
                                   (item) => item.count,
                                 ) || [],
-                              backgroundColor: [
-                                '#fbbf24', // yellow for pending
-                                '#3b82f6', // blue for confirmed
-                                '#10b981', // green for completed
-                                '#ef4444', // red for cancelled
-                              ],
+                              backgroundColor:
+                                analyticsData.statusDistribution?.map(
+                                  (item) =>
+                                    chartStatusColor[
+                                      (item.status || '').toLowerCase()
+                                    ] || '#999999',
+                                ) || [],
                             },
                           ],
                         }}

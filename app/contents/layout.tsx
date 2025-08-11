@@ -1,7 +1,7 @@
 import React from 'react'
 import Navbar from '@/components/navbar'
 
-export default function ContentsLayout({
+export default function VlogsLayout({
   children,
 }: {
   children: React.ReactNode

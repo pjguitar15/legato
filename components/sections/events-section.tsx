@@ -43,7 +43,12 @@ export default function EventsSection() {
       const data = await response.json()
 
       if (data.success) {
-        setEvents(data.data)
+        // sort newest first
+        const sorted = [...data.data].sort(
+          (a: Event, b: Event) =>
+            new Date(b.date).getTime() - new Date(a.date).getTime(),
+        )
+        setEvents(sorted)
       }
     } catch (error) {
       console.error('Error fetching events:', error)
@@ -123,7 +128,10 @@ export default function EventsSection() {
         {/* Section Header */}
         <div className='text-center mb-16'>
           <h2 className='text-4xl sm:text-5xl font-display font-bold mb-6'>
-            Recent <span className='text-gradient'>Events</span>
+            Recent{' '}
+            <span className='bg-gradient-to-r from-emerald-400 to-sky-400 bg-clip-text text-transparent'>
+              Events
+            </span>
           </h2>
           <p className='text-xl text-muted-foreground max-w-3xl mx-auto'>
             Check out some of the amazing events we've powered with our

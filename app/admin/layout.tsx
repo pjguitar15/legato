@@ -45,6 +45,7 @@ const adminNavItems = [
   { name: 'About Us', href: '/admin/about', icon: Users },
   { name: 'FAQ', href: '/admin/faq', icon: HelpCircle },
   { name: 'Company Info', href: '/admin/company', icon: Building },
+  { name: 'Vlogs (YouTube Links)', href: '/admin/vlogs', icon: ImageIcon },
 ]
 
 export default function AdminLayout({

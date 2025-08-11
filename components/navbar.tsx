@@ -1,14 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from '@/components/ui/dropdown-menu'
+// Removed dropdown-menu dependency for desktop hover menus to avoid flicker
 import {
   Menu,
   X,
@@ -18,9 +13,11 @@ import {
   Layers,
   Film,
   Headphones,
+  Info,
+  HelpCircle,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { ThemeToggle } from '@/components/theme-toggle'
+// Theme toggle removed per request
 import { useCompanyData } from '@/hooks/use-company-data'
 import { useMessenger } from '@/contexts/messenger-context'
 import Image from 'next/image'
@@ -31,6 +28,10 @@ import { useTheme } from 'next-themes'
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
+  const [isMoreOpen, setIsMoreOpen] = useState(false)
+  const [isContentOpen, setIsContentOpen] = useState(false)
+  const moreCloseTimeoutRef = useRef<number | null>(null)
+  const contentCloseTimeoutRef = useRef<number | null>(null)
   const { theme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const { companyData, isLoading } = useCompanyData()
@@ -47,11 +48,13 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  // Simplified hover open/close handled on wrapper
+
   // Important links outside dropdown
   const importantLinks = [
     { href: '#home', label: 'Home' },
     { href: '#packages', label: 'Packages' },
-    { href: '#contact', label: 'Contact' },
+    { href: '/contact', label: 'Contact' },
   ]
   // Grouped links in dropdown
   const groupedLinks = [
@@ -75,17 +78,16 @@ export default function Navbar() {
       label: 'Testimonials',
       icon: <Headphones className='w-4 h-4 mr-2' />,
     },
-    { href: '#about', label: 'About' },
-    { href: '#faq', label: 'FAQ' },
+    { href: '#about', label: 'About', icon: <Info className='w-4 h-4 mr-2' /> },
+    {
+      href: '#faq',
+      label: 'FAQ',
+      icon: <HelpCircle className='w-4 h-4 mr-2' />,
+    },
   ]
   // Content dropdown
   const contentLinks = [
     { href: '/vlogs', label: 'Vlogs', icon: <Film className='w-4 h-4 mr-2' /> },
-    {
-      href: '/live-mixing',
-      label: 'Live Mixing',
-      icon: <Headphones className='w-4 h-4 mr-2' />,
-    },
   ]
 
   const handleNavClick = (
@@ -130,14 +132,18 @@ export default function Navbar() {
         <div className='flex items-center justify-between h-16'>
           {/* Logo */}
           <div className='flex items-center space-x-3'>
-            <div className='w-32 h-auto flex items-center justify-center'>
+            <Link
+              href='/'
+              aria-label='Go to homepage'
+              className='w-32 h-auto flex items-center justify-center cursor-pointer'
+            >
               <Image
                 src={theme === 'light' ? blackLogo : whiteLogo}
                 alt={companyData?.name || 'Legato Sounds and Lights'}
                 className='absolute w-32 h-auto transition-opacity duration-300'
                 priority
               />
-            </div>
+            </Link>
           </div>
           {/* Desktop Navigation */}
           <div className='hidden md:flex items-center space-x-2'>
@@ -151,60 +157,137 @@ export default function Navbar() {
                 {item.label}
               </a>
             ))}
-            {/* Grouped dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger className='flex items-center text-foreground hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200'>
+            {/* Grouped dropdown (hover) */}
+            <div
+              className='relative'
+              onMouseEnter={() => {
+                if (moreCloseTimeoutRef.current)
+                  window.clearTimeout(moreCloseTimeoutRef.current)
+                setIsMoreOpen(true)
+              }}
+              onMouseLeave={() => {
+                if (moreCloseTimeoutRef.current)
+                  window.clearTimeout(moreCloseTimeoutRef.current)
+                moreCloseTimeoutRef.current = window.setTimeout(
+                  () => setIsMoreOpen(false),
+                  150,
+                )
+              }}
+            >
+              <button
+                onClick={() => setIsMoreOpen((v) => !v)}
+                aria-haspopup='menu'
+                aria-expanded={isMoreOpen}
+                className='flex items-center text-foreground hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 cursor-pointer'
+              >
                 More <ChevronDown className='w-4 h-4 ml-1' />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className='bg-white dark:bg-neutral-900 shadow-lg animate-fade-in-up'>
-                {groupedLinks.map((item) => (
-                  <DropdownMenuItem
-                    key={item.href}
-                    onSelect={(e) => {
-                      e.preventDefault()
-                      handleNavClick(
-                        { preventDefault: () => {} } as any,
-                        item.href,
+              </button>
+              {isMoreOpen && (
+                <div
+                  role='menu'
+                  className='absolute right-0 top-full pt-2 w-56 z-50'
+                >
+                  <div
+                    className='rounded-md border border-border bg-white dark:bg-neutral-900 shadow-lg py-2'
+                    onMouseEnter={() => {
+                      if (moreCloseTimeoutRef.current)
+                        window.clearTimeout(moreCloseTimeoutRef.current)
+                      setIsMoreOpen(true)
+                    }}
+                    onMouseLeave={() => {
+                      if (moreCloseTimeoutRef.current)
+                        window.clearTimeout(moreCloseTimeoutRef.current)
+                      moreCloseTimeoutRef.current = window.setTimeout(
+                        () => setIsMoreOpen(false),
+                        150,
                       )
-                      setIsMenuOpen(false)
-                      ;(document.activeElement as HTMLElement)?.blur?.() // closes dropdown
                     }}
-                    className='flex items-center gap-2'
                   >
-                    {item.icon}
-                    {item.label}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-            {/* Content dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger className='flex items-center text-foreground hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200'>
+                    {groupedLinks.map((item) => (
+                      <a
+                        key={item.href}
+                        href={item.href}
+                        onClick={(e) => handleNavClick(e as any, item.href)}
+                        className='flex items-center gap-2 px-3 py-2 text-sm transition-colors cursor-pointer hover:bg-black/10 dark:hover:bg-white/10'
+                        role='menuitem'
+                      >
+                        {item.icon}
+                        {item.label}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+            {/* Content dropdown (hover) */}
+            <div
+              className='relative'
+              onMouseEnter={() => {
+                if (contentCloseTimeoutRef.current)
+                  window.clearTimeout(contentCloseTimeoutRef.current)
+                setIsContentOpen(true)
+              }}
+              onMouseLeave={() => {
+                if (contentCloseTimeoutRef.current)
+                  window.clearTimeout(contentCloseTimeoutRef.current)
+                contentCloseTimeoutRef.current = window.setTimeout(
+                  () => setIsContentOpen(false),
+                  150,
+                )
+              }}
+            >
+              <button
+                onClick={() => setIsContentOpen((v) => !v)}
+                aria-haspopup='menu'
+                aria-expanded={isContentOpen}
+                className='flex items-center text-foreground hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 cursor-pointer'
+              >
                 Content <ChevronDown className='w-4 h-4 ml-1' />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className='bg-white dark:bg-neutral-900 shadow-lg animate-fade-in-up'>
-                {contentLinks.map((item) => (
-                  <DropdownMenuItem
-                    key={item.href}
-                    onSelect={() => {
-                      router.push(item.href)
-                      setIsMenuOpen(false)
-                      ;(document.activeElement as HTMLElement)?.blur?.() // closes dropdown
+              </button>
+              {isContentOpen && (
+                <div
+                  role='menu'
+                  className='absolute right-0 top-full pt-2 w-56 z-50'
+                >
+                  <div
+                    className='rounded-md border border-border bg-white dark:bg-neutral-900 shadow-lg py-2'
+                    onMouseEnter={() => {
+                      if (contentCloseTimeoutRef.current)
+                        window.clearTimeout(contentCloseTimeoutRef.current)
+                      setIsContentOpen(true)
                     }}
-                    className='flex items-center gap-2'
+                    onMouseLeave={() => {
+                      if (contentCloseTimeoutRef.current)
+                        window.clearTimeout(contentCloseTimeoutRef.current)
+                      contentCloseTimeoutRef.current = window.setTimeout(
+                        () => setIsContentOpen(false),
+                        150,
+                      )
+                    }}
                   >
-                    {item.icon}
-                    {item.label}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+                    {contentLinks.map((item) => (
+                      <button
+                        key={item.href}
+                        onClick={() => {
+                          router.push(item.href)
+                          setIsMenuOpen(false)
+                        }}
+                        className='w-full flex items-center gap-2 px-3 py-2 text-left text-sm transition-colors cursor-pointer hover:bg-black/10 dark:hover:bg-white/10'
+                        role='menuitem'
+                      >
+                        {item.icon}
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
           {/* Right side buttons */}
           <div className='flex items-center space-x-4'>
-            <ThemeToggle />
             <Button
-              onClick={handleMessenger}
+              onClick={() => router.push('/packages')}
               className='hidden sm:flex bg-[hsl(var(--primary))] text-primary-foreground hover:bg-[hsl(var(--primary))]/90'
               size='sm'
             >

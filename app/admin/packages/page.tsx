@@ -2,7 +2,15 @@
 
 import { useEffect, useState } from 'react'
 import AuthGuard from '@/components/admin/auth-guard'
-import { Plus, Edit, Trash2, DollarSign, Users } from 'lucide-react'
+import {
+  Plus,
+  Edit,
+  Trash2,
+  DollarSign,
+  Users,
+  Image as ImageIcon,
+} from 'lucide-react'
+import ImageUpload, { uploadToCloudinary } from '@/components/ui/image-upload'
 
 interface Package {
   _id: string
@@ -15,6 +23,7 @@ interface Package {
   idealFor: string
   maxGuests: number
   popular: boolean
+  image?: string
 }
 
 export default function PackagesPage() {
@@ -23,6 +32,9 @@ export default function PackagesPage() {
   const [showForm, setShowForm] = useState(false)
   const [editingPackage, setEditingPackage] = useState<Package | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [allEquipment, setAllEquipment] = useState<
+    { name: string; image?: string }[]
+  >([])
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -33,11 +45,36 @@ export default function PackagesPage() {
     idealFor: '',
     maxGuests: 50,
     popular: false,
+    image: '' as string,
   })
 
   useEffect(() => {
     fetchPackages()
+    fetchEquipmentLibrary()
   }, [])
+  const fetchEquipmentLibrary = async () => {
+    try {
+      const res = await fetch('/api/equipment')
+      const json = await res.json()
+      if (json.success) {
+        const items = (json.data || [])
+          .flatMap((cat: any) => cat.items || [])
+          .map((i: any) => ({
+            name: i.name as string,
+            image: i.image as string | undefined,
+          }))
+        // dedupe by name
+        const seen = new Set<string>()
+        const unique = items.filter((i: any) =>
+          seen.has(i.name) ? false : (seen.add(i.name), true),
+        )
+        setAllEquipment(unique)
+      }
+    } catch (e) {
+      console.error('Failed to load equipment library', e)
+      setAllEquipment([])
+    }
+  }
 
   const fetchPackages = async () => {
     try {
@@ -71,8 +108,18 @@ export default function PackagesPage() {
         ? `/api/admin/packages/${editingPackage._id}`
         : '/api/admin/packages'
 
+      // Upload image if a File instance is provided via ImageUpload
+      let imageUrl = formData.image
+      if (
+        typeof window !== 'undefined' &&
+        (formData as any)._imageFile instanceof File
+      ) {
+        imageUrl = await uploadToCloudinary((formData as any)._imageFile)
+      }
+
       const payload = {
         ...formData,
+        image: imageUrl,
         features: formData.features.filter((f) => f.trim() !== ''),
         equipment: formData.equipment.filter((e) => e.trim() !== ''),
       }
@@ -114,6 +161,7 @@ export default function PackagesPage() {
       idealFor: pkg.idealFor,
       maxGuests: pkg.maxGuests,
       popular: pkg.popular,
+      image: pkg.image || '',
     })
     setShowForm(true)
   }
@@ -146,6 +194,7 @@ export default function PackagesPage() {
       idealFor: '',
       maxGuests: 50,
       popular: false,
+      image: '',
     })
     setEditingPackage(null)
   }
@@ -288,6 +337,16 @@ export default function PackagesPage() {
                   </div>
                 </div>
 
+                {/* Image preview (if present) */}
+                {pkg.image && (
+                  <div className='mb-4'>
+                    <img
+                      src={pkg.image}
+                      alt={pkg.name}
+                      className='w-full rounded-lg border border-border object-cover max-h-40'
+                    />
+                  </div>
+                )}
                 {/* Description */}
                 <p className='text-muted-foreground text-sm mb-4'>
                   {pkg.description}
@@ -332,6 +391,37 @@ export default function PackagesPage() {
                     )}
                   </ul>
                 </div>
+
+                {/* Equipment Preview (with image if available) */}
+                {pkg.equipment?.length ? (
+                  <div className='mb-4'>
+                    <h4 className='font-medium text-sm mb-2'>
+                      Equipment Included:
+                    </h4>
+                    <ul className='text-sm text-muted-foreground space-y-1'>
+                      {pkg.equipment.slice(0, 3).map((eqName, index) => (
+                        <li key={index} className='flex items-center space-x-2'>
+                          <div className='w-6 h-6 rounded overflow-hidden border border-border bg-muted'>
+                            {(() => {
+                              const eq = allEquipment.find(
+                                (e) => e.name === eqName,
+                              )
+                              return eq?.image ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img
+                                  src={eq.image}
+                                  alt={eqName}
+                                  className='w-full h-full object-cover'
+                                />
+                              ) : null
+                            })()}
+                          </div>
+                          <span>{eqName}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
 
                 {/* Ideal For */}
                 <div className='text-sm'>
@@ -477,6 +567,30 @@ export default function PackagesPage() {
                     </div>
                   </div>
 
+                  {/* Image Upload */}
+                  <div>
+                    <label className='block text-sm font-medium mb-2'>
+                      Image
+                    </label>
+                    <ImageUpload
+                      value={formData.image}
+                      onChange={(fileOrUrl) => {
+                        if (fileOrUrl instanceof File) {
+                          // temporarily store file; will upload on submit
+                          setFormData({
+                            ...(formData as any),
+                            _imageFile: fileOrUrl,
+                          } as any)
+                        } else if (typeof fileOrUrl === 'string') {
+                          setFormData({ ...formData, image: fileOrUrl })
+                        } else {
+                          setFormData({ ...formData, image: '' })
+                        }
+                      }}
+                      placeholder='Click to select package image'
+                    />
+                  </div>
+
                   <div>
                     <div className='flex items-center space-x-2 mb-4'>
                       <input
@@ -537,7 +651,7 @@ export default function PackagesPage() {
                     </div>
                   </div>
 
-                  {/* Equipment */}
+                  {/* Equipment (from library only) */}
                   <div>
                     <div className='flex items-center justify-between mb-2'>
                       <label className='block text-sm font-medium'>
@@ -553,16 +667,41 @@ export default function PackagesPage() {
                     </div>
                     <div className='space-y-2'>
                       {formData.equipment.map((item, index) => (
-                        <div key={index} className='flex space-x-2'>
-                          <input
-                            type='text'
+                        <div
+                          key={index}
+                          className='flex items-center space-x-2'
+                        >
+                          <div className='w-10 h-10 rounded-md overflow-hidden border border-border bg-muted'>
+                            {(() => {
+                              const eq = allEquipment.find(
+                                (e) => e.name === item,
+                              )
+                              return eq?.image ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img
+                                  src={eq.image}
+                                  alt={item}
+                                  className='w-full h-full object-cover'
+                                />
+                              ) : null
+                            })()}
+                          </div>
+                          <select
                             value={item}
                             onChange={(e) =>
                               updateEquipment(index, e.target.value)
                             }
                             className='flex-1 px-3 py-2 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent'
-                            placeholder='e.g., RCF ART 745A Speakers'
-                          />
+                          >
+                            <option value='' disabled>
+                              Select equipment...
+                            </option>
+                            {allEquipment.map((eq) => (
+                              <option key={eq.name} value={eq.name}>
+                                {eq.name}
+                              </option>
+                            ))}
+                          </select>
                           {formData.equipment.length > 1 && (
                             <button
                               type='button'

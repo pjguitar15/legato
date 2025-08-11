@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { MessageCircle, Phone, Music, Zap, Volume2 } from 'lucide-react'
+import { MessageCircle, ExternalLink, Music, Zap, Volume2 } from 'lucide-react'
 import { useCompanyData } from '@/hooks/use-company-data'
 import { SkeletonHero } from '@/components/ui/skeleton'
 import Image from 'next/image'
@@ -13,7 +13,10 @@ import heroBg5 from '@/public/hero-bg-5.jpg'
 import heroBg6 from '@/public/hero-bg-6.jpg'
 import heroBg7 from '@/public/hero-bg-7.jpg'
 import { motion, AnimatePresence, type Variants } from 'framer-motion'
+import GradientText from '@/components/ui/gradient-text'
 import { useRouter } from 'next/navigation'
+// using built-in gradient text utility
+// Removed react-bits dependency to avoid pulling react-native-web
 
 export default function HeroSection() {
   const [currentSlide, setCurrentSlide] = useState(0)
@@ -41,10 +44,12 @@ export default function HeroSection() {
     router.push('/packages')
   }
 
-  const handleCall = () => {
-    if (companyData?.contact?.phone) {
-      window.open(`tel:${companyData.contact.phone}`, '_self')
-    }
+  const handleOpenFacebook = () => {
+    const fb =
+      (companyData as any)?.socialMedia?.facebook ||
+      (companyData as any)?.contact?.facebook ||
+      (companyData as any)?.contact?.messenger
+    if (fb) window.open(fb, '_blank', 'noopener,noreferrer')
   }
 
   // Animation variants for Framer Motion
@@ -159,21 +164,28 @@ export default function HeroSection() {
           {/* Main Heading */}
           <motion.h1
             variants={itemVariants}
-            className='text-4xl sm:text-6xl lg:text-8xl font-display font-bold mb-6'
+            className='text-3xl sm:text-5xl lg:text-7xl font-display font-bold mb-6 tracking-[0.06em]'
           >
             <motion.span variants={itemVariants} className='text-white'>
               {companyData.name.split(' ')[0]}
             </motion.span>
             <br />
-            <motion.span variants={itemVariants} className='text-gradient'>
-              {companyData.name.split(' ').slice(1).join(' ')}
+            <motion.span variants={itemVariants} className='inline-block'>
+              <GradientText
+                className='font-extrabold'
+                colors={['#10b981', '#34d399', '#60a5fa', '#34d399', '#10b981']}
+                animationSpeed={3}
+                showBorder={false}
+              >
+                {companyData.name.split(' ').slice(1).join(' ')}
+              </GradientText>
             </motion.span>
           </motion.h1>
 
           {/* Tagline */}
           <motion.p
             variants={itemVariants}
-            className='text-xl sm:text-3xl text-gray-200 mb-4 max-w-4xl mx-auto font-semibold'
+            className='text-xl sm:text-3xl text-white mb-4 max-w-4xl mx-auto font-semibold'
           >
             {companyData.tagline}
           </motion.p>
@@ -244,11 +256,11 @@ export default function HeroSection() {
               variants={buttonVariants}
               whileHover='hover'
               whileTap='tap'
-              onClick={handleCall}
+              onClick={handleOpenFacebook}
               className='bg-white/10 backdrop-blur-sm text-white border border-white/20 px-8 py-4 rounded-xl hover:bg-white/20 transition-all duration-300 flex items-center space-x-3 text-lg font-bold'
             >
-              <Phone className='w-6 h-6' />
-              <span>Call Now</span>
+              <ExternalLink className='w-6 h-6' />
+              <span>View Facebook Page</span>
             </motion.button>
           </motion.div>
 

@@ -40,7 +40,16 @@ export default function EquipmentSection() {
       const data = await response.json()
 
       if (data.success && data.data) {
-        setEquipmentData(data.data)
+        // Ensure "Audio Equipment" tab is first if present
+        const list: EquipmentCategory[] = data.data
+        const audioIndex = list.findIndex((c) => /audio/i.test(c.name || ''))
+        const reordered = [...list]
+        if (audioIndex > 0) {
+          const [audio] = reordered.splice(audioIndex, 1)
+          reordered.unshift(audio)
+        }
+        setEquipmentData(reordered)
+        setActiveCategory(0)
       }
     } catch (error) {
       console.error('Error fetching equipment:', error)
@@ -136,7 +145,10 @@ export default function EquipmentSection() {
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            Our <span className='text-gradient'>Equipment</span>
+            Our{' '}
+            <span className='bg-gradient-to-r from-emerald-400 to-sky-400 bg-clip-text text-transparent'>
+              Equipment
+            </span>
           </motion.h2>
           <motion.p
             className='text-xl text-muted-foreground max-w-3xl mx-auto'
@@ -166,7 +178,7 @@ export default function EquipmentSection() {
                 onClick={() => setActiveCategory(index)}
                 className={`px-6 py-3 rounded-lg font-semibold cursor-pointer transition-all duration-300 ${
                   activeCategory === index
-                    ? 'bg-[hsl(var(--primary))] text-primary-foreground'
+                    ? 'bg-[hsl(var(--primary))] text-white'
                     : 'text-muted-foreground hover:text-foreground hover:bg-accent'
                 }`}
                 whileHover={{ scale: 1.05 }}

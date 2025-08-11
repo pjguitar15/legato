@@ -46,6 +46,20 @@
     --ring: 160 84% 39%;
   }
 
+  /* Prevent layout shift from scrollbar toggling */
+  html {
+    overflow-y: scroll;
+    /* Reserve gutter only on the scrollbar side to avoid left-side offset */
+    scrollbar-gutter: stable;
+    overflow-x: hidden;
+    background-color: hsl(var(--background));
+  }
+
+  /* Prevent frameworks from adding body padding-right to offset scrollbar */
+  body {
+    padding-right: 0 !important;
+  }
+
   * {
     border-color: hsl(var(--border));
   }
@@ -54,6 +68,13 @@
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
     font-family: Arial, Helvetica, sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* Prevent popper portals from causing horizontal overflow */
+  [data-radix-popper-content-wrapper] {
+    max-width: 100vw;
+    overflow-x: hidden;
   }
 }
 
@@ -86,7 +107,7 @@
   }
 
   .font-display {
-    font-family: var(--font-montserrat);
+    font-family: var(--font-hero), var(--font-league-spartan);
   }
 
   /* Custom scrollbar */
@@ -155,6 +176,12 @@
   /* Animation classes */
   .animate-fade-in-up {
     animation: fade-in-up 0.6s ease-out;
+  }
+
+  /* Gradient text pan */
+  .gradient-text-anim {
+    animation: gradient-text-shift 4s ease-in-out infinite;
+    background-size: 200% 100%;
   }
 
   .animate-float {
@@ -262,6 +289,18 @@
 }
 
 @keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes gradient-text-shift {
   0% {
     background-position: 0% 50%;
   }

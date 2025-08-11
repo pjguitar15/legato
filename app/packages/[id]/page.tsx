@@ -40,6 +40,9 @@ export default function PackageDetailPage() {
   const [pkg, setPkg] = useState<Pkg | null>(null)
   const [gallery, setGallery] = useState<GalleryItem[]>([])
   const [equipmentNames, setEquipmentNames] = useState<string[]>([])
+  const [equipLoading, setEquipLoading] = useState(true)
+  const [equipInfo, setEquipInfo] = useState<any | null>(null)
+  const [isEquipModalOpen, setIsEquipModalOpen] = useState(false)
   const formRef = useRef<HTMLFormElement | null>(null)
   const [isSending, setIsSending] = useState(false)
   const [isPreviewOpen, setIsPreviewOpen] = useState(false)
@@ -51,6 +54,28 @@ export default function PackageDetailPage() {
   const [eventVenue, setEventVenue] = useState('')
   const [eventGuests, setEventGuests] = useState('')
   const [eventNotes, setEventNotes] = useState('')
+
+  function getEquipmentImage(name: string): string {
+    const n = name.toLowerCase()
+    if (n.includes('rcf') || n.includes('speaker') || n.includes('qsc')) {
+      return '/rcf.webp'
+    }
+    if (
+      n.includes('mixer') ||
+      n.includes('sq5') ||
+      n.includes('allen') ||
+      n.includes('heath')
+    ) {
+      return '/sq5.jpg'
+    }
+    if (n.includes('shure') || n.includes('mic') || n.includes('microphone')) {
+      return '/shure.webp'
+    }
+    if (n.includes('light')) {
+      return '/placeholder.jpg'
+    }
+    return '/placeholder.jpg'
+  }
 
   const defaultMessage = useMemo(() => {
     const name = pkg?.name ?? 'Package'
@@ -72,6 +97,7 @@ export default function PackageDetailPage() {
         setPkg(json.data)
         setEquipmentNames(json.data?.equipment || [])
       }
+      setEquipLoading(false)
     })()
     ;(async () => {
       const pkgName = encodeURIComponent(
@@ -151,26 +177,60 @@ export default function PackageDetailPage() {
               What you get with this package
             </p>
             <div className='space-y-3'>
-              {equipmentNames.map((name, idx) => (
-                <div
-                  key={idx}
-                  className='group relative overflow-hidden rounded-xl border border-border bg-card p-4 hover:shadow-lg transition'
-                >
-                  <div className='flex items-center gap-3'>
-                    <div className='h-12 w-12 rounded-lg bg-muted/60 flex items-center justify-center text-xs font-medium'>
-                      {name.split(' ').slice(0, 2).join(' ')}
-                    </div>
-                    <div>
-                      <div className='font-semibold'>{name}</div>
-                      <div className='text-xs text-muted-foreground'>
-                        Included • Qty varies per venue
+              {equipLoading && (
+                <>
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className='h-16 rounded-xl border border-border bg-muted/40 animate-pulse'
+                    />
+                  ))}
+                </>
+              )}
+              {!equipLoading &&
+                equipmentNames.map((name, idx) => (
+                  <button
+                    key={idx}
+                    onClick={async () => {
+                      // fetch equipment details (public endpoint returns categories)
+                      const res = await fetch('/api/equipment')
+                      const json = await res.json()
+                      const flat = (json.data || []).flatMap(
+                        (c: any) => c.items,
+                      )
+                      const found = flat.find(
+                        (it: any) =>
+                          it.name.toLowerCase() === name.toLowerCase(),
+                      ) || {
+                        name,
+                        description: 'Details to follow',
+                        features: [],
+                      }
+                      setEquipInfo(found)
+                      setIsEquipModalOpen(true)
+                    }}
+                    className='group relative w-full text-left overflow-hidden rounded-xl border border-border bg-card p-4 hover:shadow-lg transition cursor-pointer'
+                  >
+                    <div className='flex items-center gap-3'>
+                      <div className='h-12 w-12 rounded-lg bg-muted/60 relative overflow-hidden flex items-center justify-center'>
+                        <Image
+                          src={getEquipmentImage(name)}
+                          alt={name}
+                          fill
+                          className='object-cover'
+                        />
+                      </div>
+                      <div>
+                        <div className='font-semibold'>{name}</div>
+                        <div className='text-xs text-muted-foreground'>
+                          Click to view details
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className='absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-r from-transparent to-black/5' />
-                </div>
-              ))}
-              {equipmentNames.length === 0 && (
+                    <div className='absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-r from-transparent to-black/5' />
+                  </button>
+                ))}
+              {!equipLoading && equipmentNames.length === 0 && (
                 <div className='text-sm text-muted-foreground'>
                   Equipment details to follow for this package.
                 </div>
@@ -407,6 +467,30 @@ export default function PackageDetailPage() {
                 {isSending ? 'Sending…' : 'Send email'}
               </button>
             </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Equipment Info Modal */}
+        <Dialog open={isEquipModalOpen} onOpenChange={setIsEquipModalOpen}>
+          <DialogContent className='sm:max-w-lg'>
+            <DialogHeader>
+              <DialogTitle>{equipInfo?.name || 'Equipment'}</DialogTitle>
+            </DialogHeader>
+            <div className='space-y-3'>
+              <div className='text-sm text-muted-foreground'>
+                {equipInfo?.brand && <span>Brand: {equipInfo.brand} • </span>}
+                {equipInfo?.type && <span>Type: {equipInfo.type}</span>}
+              </div>
+              <p className='text-sm'>{equipInfo?.description}</p>
+              {Array.isArray(equipInfo?.features) &&
+                equipInfo.features.length > 0 && (
+                  <ul className='list-disc pl-5 text-sm text-muted-foreground'>
+                    {equipInfo.features.map((f: string, i: number) => (
+                      <li key={i}>{f}</li>
+                    ))}
+                  </ul>
+                )}
+            </div>
           </DialogContent>
         </Dialog>
       </div>

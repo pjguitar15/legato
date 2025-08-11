@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import {
   Check,
   Star,
@@ -9,12 +10,8 @@ import {
   ChevronUp,
 } from 'lucide-react'
 import { SkeletonPackage, SkeletonText } from '@/components/ui/skeleton'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import TextRotate from '@/components/ui/text-rotate'
+// removed dialog imports since we now navigate directly to the package page
 
 interface Package {
   _id: string
@@ -36,7 +33,7 @@ export default function PackagesSection() {
   const [expandedEquipment, setExpandedEquipment] = useState<Set<string>>(
     new Set(),
   )
-  const [selected, setSelected] = useState<Package | null>(null)
+  // removed selected modal state; navigation is direct
 
   useEffect(() => {
     fetchPackages()
@@ -58,7 +55,7 @@ export default function PackagesSection() {
     }
   }
 
-  const handleSelect = (pkg: Package) => setSelected(pkg)
+  // no-op: modal removed
 
   const toggleEquipmentExpansion = (packageId: string) => {
     setExpandedEquipment((prev) => {
@@ -103,7 +100,13 @@ export default function PackagesSection() {
         {/* Section Header */}
         <div className='text-center mb-16'>
           <h2 className='text-4xl sm:text-5xl font-display font-bold mb-6'>
-            Our <span className='text-gradient'>Packages</span>
+            Our{' '}
+            <span className='bg-gradient-to-r from-emerald-400 to-sky-400 bg-clip-text text-transparent'>
+              <TextRotate
+                words={['Packages', 'Setups', 'Rigs']}
+                intervalMs={1600}
+              />
+            </span>
           </h2>
           <p className='text-xl text-muted-foreground max-w-3xl mx-auto'>
             Professional sound and lighting packages designed for rock bands and
@@ -216,8 +219,8 @@ export default function PackagesSection() {
               )}
 
               {/* CTA Button */}
-              <button
-                onClick={() => handleSelect(pkg)}
+              <Link
+                href={`/packages/${pkg._id}`}
                 className={`w-full py-3 px-6 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center space-x-2 ${
                   pkg.popular
                     ? 'bg-gradient-to-r from-emerald-400 to-emerald-600 text-white hover:from-emerald-500 hover:to-emerald-700 shadow-lg hover:shadow-xl'
@@ -226,7 +229,7 @@ export default function PackagesSection() {
               >
                 <MessageCircle className='w-4 h-4' />
                 <span>Book This Package</span>
-              </button>
+              </Link>
             </div>
           ))}
         </div>
@@ -237,42 +240,16 @@ export default function PackagesSection() {
             Need a custom package? We can tailor our services to meet your
             specific needs.
           </p>
-          <button
-            onClick={() => setSelected(packages[0])}
-            className='bg-secondary text-secondary-foreground hover:bg-secondary/80 px-8 py-3 rounded-lg font-semibold transition-colors'
+          <Link
+            href='/contact'
+            className='inline-block bg-secondary text-secondary-foreground hover:bg-secondary/80 px-8 py-3 rounded-lg font-semibold transition-colors'
           >
             Contact Us for Custom Quote
-          </button>
+          </Link>
         </div>
       </div>
 
-      <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>How would you like to contact us?</DialogTitle>
-          </DialogHeader>
-          {selected && (
-            <div className='space-y-4'>
-              <p className='text-sm text-muted-foreground'>
-                Package:{' '}
-                <span className='font-medium text-foreground'>
-                  {selected.name}
-                </span>
-              </p>
-              <div className='grid grid-cols-2 gap-3'>
-                {['Messenger', 'Telegram', 'Email', 'SMS'].map((label) => (
-                  <button
-                    key={label}
-                    className='rounded-lg border bg-card px-4 py-3 text-sm font-semibold transition hover:border-primary hover:shadow'
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      {/* Modal removed; direct navigation to package detail page */}
     </section>
   )
 }
